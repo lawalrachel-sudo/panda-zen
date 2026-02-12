@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════
+   PANDA ZEN — Global Styles
+   Style: Classic Zen Spa
+   ═══════════════════════════════════════ */
+
+:root {
+  --zen-bg: #f5f0e8;
+  --leaf-primary: #4a7c6f;
+  --leaf-dark: #2f5448;
+  --water-accent: #5da3c8;
+  --pebble-warm: #c9baa5;
+  --lotus-accent: #d4789a;
+  --text-main: #2a2420;
+  --text-soft: #5c5040;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  background-color: var(--zen-bg);
+  color: var(--text-main);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Fond texturé subtil */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(74, 124, 111, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(93, 163, 200, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(201, 186, 165, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Scrollbar zen */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pebble-warm);
+  border-radius: 99px;
+}
+
+/* Safe area pour les iPhones avec encoche */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Animations utilitaires */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .zen-shadow {
+    box-shadow: 0 4px 20px rgba(42, 36, 32, 0.08), 0 1px 4px rgba(42, 36, 32, 0.04);
+  }
+  .zen-shadow-lg {
+    box-shadow: 0 8px 32px rgba(42, 36, 32, 0.12), 0 2px 8px rgba(42, 36, 32, 0.06);
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Page transitions */
+.page-enter {
+  animation: fadeIn 0.4s ease-out, slideUp 0.4s ease-out;
+}
