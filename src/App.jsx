@@ -6,23 +6,25 @@ import { useState } from "react";
 // 16/02/2026
 // ═══════════════════════════════════════
 
-// Emojis pandas (en prod = vrais PNG dans /images/)
+// PNG pandas transparents dans /images/
+const pi = (file, alt) => <img src={`/images/${file}`} alt={alt} className="panda-icon" loading="lazy" />;
 const P = {
-  logo: "🐼",        // galets_zen_.png
-  original: "🐼",    // ORIGINAL.png
-  hello: "👋",        // main_bonjour_V2.png
-  breathe: "🌬️",     // souffle.png
-  cards: "🎴",        // Cartes.png
-  water: "💧",        // bois_de_leau.png
-  mirror: "🪞",       // miroir_positif.png
-  mirrorNeg: "😔",    // miroir_ne_gatif.png
-  relax: "😌",        // Relax.png
-  meditate: "🧘",     // me_ditant.png
-  thumbsUp: "👍",     // pouce_v2.png
-  couple: "💞",       // Relationnel.png
-  galets: "🪨",
-  envelope: "✉️",     // enveloppe.png
-  mudra: "🙏",
+  logo:      pi('ORIGINAL.png', 'Panda Zen'),
+  original:  pi('ORIGINAL.png', 'Panda'),
+  hello:     pi('main_bonjour_bouche_ouverte.png', 'Hello'),
+  breathe:   pi('souffle.png', 'Respire'),
+  cards:     pi('Cartes.png', 'Cartes'),
+  water:     pi('bois_de_leau.png', 'Eau'),
+  mirror:    pi('miroir_positif.png', 'Miroir'),
+  mirrorNeg: pi('miroir_ne_gatif.png', 'Miroir négatif'),
+  relax:     pi('Relax.png', 'Relax'),
+  meditate:  pi('me_ditant.png', 'Méditation'),
+  thumbsUp:  pi('pouce_v2.png', 'Bravo'),
+  couple:    pi('Relationnel.png', 'Relations'),
+  galets:    pi('GALET_SEUL.png', 'Galet'),
+  envelope:  pi('enveloppe.png', 'Enveloppe'),
+  mudra:     pi('galets_zen_.png', 'Mudrâ'),
+  bambou:    pi('HOME_bambou.png', 'Accueil'),
 };
 
 // ═══ DONNÉES PROFIL (démo) ═══
@@ -483,13 +485,13 @@ export default function PandaZenApp() {
   const [streak] = useState(3);
 
   const tabs = [
-    { id: "home", label: "Accueil", emoji: "🎋" },
-    { id: "breathe", label: "Respirer", emoji: "🌬️" },
-    { id: "card", label: "Carte", emoji: "🎴" },
-    { id: "relax", label: "Relax", emoji: "😌" },
-    { id: "water", label: "Eau", emoji: "💧" },
-    { id: "relations", label: "Relations", emoji: "💞" },
-    { id: "profile", label: "_hidden_", emoji: "" },
+    { id: "home", label: "Accueil", icon: P.bambou },
+    { id: "breathe", label: "Respirer", icon: P.breathe },
+    { id: "card", label: "Carte", icon: P.cards },
+    { id: "relax", label: "Relax", icon: P.relax },
+    { id: "water", label: "Eau", icon: P.water },
+    { id: "relations", label: "Relations", icon: P.couple },
+    { id: "profile", label: "_hidden_", icon: null },
   ];
 
   const screens = [
@@ -509,6 +511,25 @@ export default function PandaZenApp() {
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         /* ═══ APP SHELL ═══ */
+        .panda-icon {
+          display: inline-block;
+          object-fit: contain;
+          vertical-align: middle;
+        }
+        /* Tailles par contexte */
+        .header-panda .panda-icon { width: 32px; height: 32px; }
+        .home-hero-panda .panda-icon { width: 60px; height: 60px; }
+        .home-stat-icon .panda-icon { width: 22px; height: 22px; }
+        .home-action-panda .panda-icon { width: 40px; height: 40px; }
+        .home-galet-badge .panda-icon { width: 14px; height: 14px; }
+        .module-panda .panda-icon { width: 80px; height: 80px; }
+        .module-panda.big .panda-icon { width: 100px; height: 100px; }
+        .water-panda .panda-icon { width: 48px; height: 48px; }
+        .box-panda .panda-icon { width: 40px; height: 40px; }
+        .miroir-animal .panda-icon { width: 48px; height: 48px; }
+        .miroir-insight-panda .panda-icon { width: 28px; height: 28px; }
+        .avatar-circle .panda-icon { width: 44px; height: 44px; }
+        .nav-emoji .panda-icon { width: 22px; height: 22px; }
         .app-shell {
           max-width: 430px; margin: 0 auto; min-height: 100vh;
           background: linear-gradient(180deg, #f5f0eb 0%, #f0ede8 40%, #e8f0e4 100%);
@@ -808,7 +829,7 @@ export default function PandaZenApp() {
         <div className="app-nav">
           {tabs.filter(t => t.id !== "profile").map((t, i) => (
             <button key={t.id} className={`nav-btn ${tab===i?"active":""}`} onClick={() => setTab(i)}>
-              <span className="nav-emoji">{t.emoji}</span>
+              <span className="nav-emoji">{t.icon}</span>
               <span className="nav-label">{t.label}</span>
               {tab===i && <div className="nav-dot" />}
             </button>
