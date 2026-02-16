@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // ═══════════════════════════════════════
 // PANDA ZEN — APP COMPLÈTE v1
@@ -72,7 +72,6 @@ const MUDRAS_PALIERS = [
 // ═══════════════════════════════════════
 const HomeScreen = ({ galets, streak, onNav }) => {
   const actions = [
-    { p: P.mirror, t: "Ton Miroir du jour", d: "Découvre quel profil tu actives aujourd'hui", tab: 6, g: 5 },
     { p: P.cards, t: "Carte VITA du jour", d: "Ton message VITA® quotidien", tab: 2, g: 1 },
     { p: P.relax, t: "Panda Relax", d: "16 animaux totems pour t'accompagner dans les 64 exercices", tab: 3, g: 3 },
     { p: P.breathe, t: "Respiration", d: "Des exercices adaptés selon ton profil", tab: 1, g: 2 },
@@ -92,6 +91,16 @@ const HomeScreen = ({ galets, streak, onNav }) => {
         <div className="home-stat-card"><div className="home-stat-icon">{P.galets}</div><div className="home-stat-val gold">{galets}</div><div className="home-stat-label">galets récoltés</div></div>
         <div className="home-stat-card"><div className="home-stat-icon">🔥</div><div className="home-stat-val orange">{streak}</div><div className="home-stat-label">jours de suite</div></div>
       </div>
+      {/* MIROIR DU JOUR — CTA PRINCIPAL */}
+      <button className="miroir-cta-home" onClick={() => onNav(6)}>
+        <div className="miroir-cta-panda">{P.mirror}</div>
+        <div className="miroir-cta-content">
+          <div className="miroir-cta-title">Mon Miroir du jour</div>
+          <div className="miroir-cta-desc">Découvre quel profil tu actives aujourd'hui · 3 min</div>
+        </div>
+        <div className="miroir-cta-badge"><span className="galet-inline">{P.galets}</span> +5</div>
+        <span className="miroir-cta-arrow">→</span>
+      </button>
       <h3 className="home-section-title">Ton chemin zen</h3>
       {actions.map((a, i) => (
         <button key={i} className="home-action" onClick={() => a.tab !== null && onNav(a.tab)} style={{ animationDelay: `${i * 0.06}s` }}>
@@ -100,7 +109,7 @@ const HomeScreen = ({ galets, streak, onNav }) => {
             <div className="home-action-title">{a.t}</div>
             <div className="home-action-desc">{a.d}</div>
           </div>
-          <div className="home-galet-badge">{P.galets} +{a.g}</div>
+          <div className="home-galet-badge"><span className="galet-inline">{P.galets}</span> +{a.g}</div>
         </button>
       ))}
     </div>
@@ -266,7 +275,7 @@ const ProfileScreen = ({ galets, streak }) => {
             </div>
           )}
           <div className="profil-stats-row">
-            <div className="pstat"><div className="pstat-v gold">🪨 {galets}</div><div className="pstat-l">galets</div></div>
+            <div className="pstat"><div className="pstat-v gold">{P.galets} {galets}</div><div className="pstat-l">galets</div></div>
             <div className="pstat-div" />
             <div className="pstat"><div className="pstat-v orange">🔥 {streak}</div><div className="pstat-l">jours</div></div>
             <div className="pstat-div" />
@@ -330,7 +339,7 @@ const ProfileScreen = ({ galets, streak }) => {
                     <div className="testimonial-zone">
                       <h4>⭐ Mon évolution : Avant → Après</h4>
                       <textarea className="testimonial-input" placeholder="Qu'est-ce qui a changé pour toi dans cette relation ?" value={testimonials[r.id]||""} onChange={e => setTestimonials({...testimonials,[r.id]:e.target.value})} />
-                      <button className="testimonial-submit">Partager + gagner 🪨 1 galet</button>
+                      <button className="testimonial-submit">Partager + gagner {P.galets} 1 galet</button>
                     </div>
                   )}
                 </div>
@@ -394,10 +403,10 @@ const ProfileScreen = ({ galets, streak }) => {
           <div className="path-stats">
             <div className="path-stat"><div className="path-stat-v">{streak}/73</div><div className="path-stat-l">jours</div></div>
             <div className="path-stat"><div className="path-stat-v">{MUDRAS_PALIERS.filter(m => streak >= m.day).length}/18</div><div className="path-stat-l">mudrâs reçus</div></div>
-            <div className="path-stat"><div className="path-stat-v">🪨 {streak}</div><div className="path-stat-l">galets du chemin</div></div>
+            <div className="path-stat"><div className="path-stat-v">{P.galets} {streak}</div><div className="path-stat-l">galets du chemin</div></div>
           </div>
         </div>
-        <div className="path-galet-hint">🪨 +1 galet pour chaque jour de pratique entre deux mudrâs</div>
+        <div className="path-galet-hint">{P.galets} +1 galet pour chaque jour de pratique entre deux mudrâs</div>
         <button className="path-cta">🙏 Voir mes mudrâs reçus</button>
         <div className="path-credit">Transmis avec gratitude, d'après Jacqueline (2016) 🙏</div>
       </div>
@@ -405,7 +414,7 @@ const ProfileScreen = ({ galets, streak }) => {
       {/* BOX 6 — GALETS */}
       <div className="profil-box" style={{ animationDelay: "0.25s" }}>
         <div className="box-header"><div className="box-panda">{P.galets}</div><div><div className="box-title">Mes galets gagnés</div><div className="box-subtitle">Construis ton équilibre, galet par galet</div></div></div>
-        <div className="galets-summary"><div className="galets-big">🪨 {galets}</div><div className="galets-label">galets au total</div></div>
+        <div className="galets-summary"><div className="galets-big">{P.galets} {galets}</div><div className="galets-label">galets au total</div></div>
         <div className="galets-grid">
           <div className="galet-item"><div className="galet-item-val">+2</div><div className="galet-item-label">RESPIRATION</div></div>
           <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">CARTE VITA</div></div>
@@ -414,7 +423,7 @@ const ProfileScreen = ({ galets, streak }) => {
           <div className="galet-item"><div className="galet-item-val">+3</div><div className="galet-item-label">PANDA RELAX</div></div>
           <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">TÉMOIGNAGE</div></div>
         </div>
-        <button className="galets-earn-btn">🪨 Clique pour gagner encore des galets aujourd'hui !</button>
+        <button className="galets-earn-btn">{P.galets} Clique pour gagner encore des galets aujourd'hui !</button>
         <div className="galets-explain">💡 Tes galets symbolisent ton engagement envers toi-même. Chaque action compte. Invite tes proches pour en gagner davantage !</div>
       </div>
 
@@ -423,7 +432,7 @@ const ProfileScreen = ({ galets, streak }) => {
         <div className="box-header"><div className="box-panda">{P.envelope}</div><div><div className="box-title">Parrainage</div><div className="box-subtitle">Invite tes proches, gagne des galets</div></div></div>
         <div className="parrain-stats">
           <div className="parrain-stat"><div className="parrain-v">{DEMO_FILLEULS.length}</div><div className="parrain-l">filleuls</div></div>
-          <div className="parrain-stat"><div className="parrain-v gold">🪨 {DEMO_FILLEULS.reduce((s,f) => s+f.galets,0)}</div><div className="parrain-l">galets gagnés</div></div>
+          <div className="parrain-stat"><div className="parrain-v gold">{P.galets} {DEMO_FILLEULS.reduce((s,f) => s+f.galets,0)}</div><div className="parrain-l">galets gagnés</div></div>
         </div>
         <div className="parrain-rules">
           <div className="parrain-rules-title" onClick={() => setShowParrainRules(!showParrainRules)}>{showParrainRules ? "▼" : "▶"} Comment ça marche ?</div>
@@ -437,7 +446,7 @@ const ProfileScreen = ({ galets, streak }) => {
             <span style={{fontSize:18}}>👤</span>
             <span className="filleul-name">{f.name}</span>
             <span className="filleul-date">{f.date}</span>
-            <span className={`filleul-badge ${f.type}`}>{f.type==="payant"?"🪨 +2":"🪨 +1"}</span>
+            <span className={`filleul-badge ${f.type}`}>{P.galets} +{f.type==="payant"?"2":"1"}</span>
           </div>
         ))}
         <button className="share-btn">✉️ Inviter un ami</button>
@@ -477,12 +486,33 @@ const ProfileScreen = ({ galets, streak }) => {
 };
 
 // ═══════════════════════════════════════
+// SPLASH SCREEN
+// ═══════════════════════════════════════
+const SplashScreen = ({ onDone }) => {
+  const [fadeOut, setFadeOut] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setFadeOut(true), 1800);
+    const t2 = setTimeout(onDone, 2400);
+    return () => { clearTimeout(t); clearTimeout(t2); };
+  }, []);
+  return (
+    <div className={`splash-screen ${fadeOut ? "fade-out" : ""}`}>
+      <div className="splash-panda">{P.original}</div>
+      <div className="splash-title">PANDA ZEN</div>
+      <div className="splash-sub">Mieux te comprendre, chaque jour.</div>
+      <div className="splash-credit">Centre VITA®</div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════
 // APP PRINCIPALE
 // ═══════════════════════════════════════
 export default function PandaZenApp() {
   const [tab, setTab] = useState(0);
   const [galets, setGalets] = useState(12);
   const [streak] = useState(3);
+  const [showSplash, setShowSplash] = useState(true);
 
   const tabs = [
     { id: "home", label: "Accueil", icon: P.bambou },
@@ -516,20 +546,62 @@ export default function PandaZenApp() {
           object-fit: contain;
           vertical-align: middle;
         }
-        /* Tailles par contexte */
-        .header-panda .panda-icon { width: 32px; height: 32px; }
-        .home-hero-panda .panda-icon { width: 60px; height: 60px; }
-        .home-stat-icon .panda-icon { width: 22px; height: 22px; }
-        .home-action-panda .panda-icon { width: 40px; height: 40px; }
-        .home-galet-badge .panda-icon { width: 14px; height: 14px; }
-        .module-panda .panda-icon { width: 80px; height: 80px; }
-        .module-panda.big .panda-icon { width: 100px; height: 100px; }
-        .water-panda .panda-icon { width: 48px; height: 48px; }
-        .box-panda .panda-icon { width: 40px; height: 40px; }
-        .miroir-animal .panda-icon { width: 48px; height: 48px; }
-        .miroir-insight-panda .panda-icon { width: 28px; height: 28px; }
-        .avatar-circle .panda-icon { width: 44px; height: 44px; }
-        .nav-emoji .panda-icon { width: 22px; height: 22px; }
+        /* Tailles par contexte — agrandies */
+        .header-panda .panda-icon { width: 38px; height: 38px; }
+        .home-hero-panda .panda-icon { width: 80px; height: 80px; }
+        .home-stat-icon .panda-icon { width: 28px; height: 28px; }
+        .home-action-panda .panda-icon { width: 54px; height: 54px; }
+        .home-galet-badge .panda-icon { width: 18px; height: 18px; }
+        .galet-inline .panda-icon { width: 18px; height: 18px; }
+        .module-panda .panda-icon { width: 100px; height: 100px; }
+        .module-panda.big .panda-icon { width: 120px; height: 120px; }
+        .water-panda .panda-icon { width: 60px; height: 60px; }
+        .box-panda .panda-icon { width: 50px; height: 50px; }
+        .miroir-animal .panda-icon { width: 56px; height: 56px; }
+        .miroir-insight-panda .panda-icon { width: 34px; height: 34px; }
+        .avatar-circle .panda-icon { width: 52px; height: 52px; }
+        .nav-emoji .panda-icon { width: 26px; height: 26px; }
+        .miroir-cta-panda .panda-icon { width: 56px; height: 56px; }
+        .galets-big .panda-icon { width: 36px; height: 36px; }
+        .pstat-v .panda-icon { width: 18px; height: 18px; }
+        .parrain-v .panda-icon { width: 18px; height: 18px; }
+        .filleul-badge .panda-icon { width: 14px; height: 14px; }
+        .splash-panda .panda-icon { width: 140px; height: 140px; }
+        .miroir-share .panda-icon { width: 20px; height: 20px; }
+
+        /* ═══ SPLASH SCREEN ═══ */
+        .splash-screen {
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
+          background: linear-gradient(180deg, #f5f0eb 0%, #e8f0e4 100%);
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          transition: opacity 0.6s ease;
+        }
+        .splash-screen.fade-out { opacity: 0; pointer-events: none; }
+        .splash-panda { animation: splashBounce 0.8s ease 0.3s both; }
+        .splash-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 32px; color: #1e270c; margin-top: 16px; animation: slideUp 0.6s ease 0.6s both; }
+        .splash-sub { font-size: 15px; color: #6b7c6e; margin-top: 8px; animation: slideUp 0.6s ease 0.8s both; }
+        .splash-credit { font-size: 12px; color: #9aaa9c; margin-top: 24px; animation: slideUp 0.6s ease 1s both; }
+        @keyframes splashBounce { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* ═══ MIROIR CTA HOME ═══ */
+        .miroir-cta-home {
+          width: 100%; display: flex; align-items: center; gap: 14px;
+          background: linear-gradient(135deg, #34490a, #3a5a40);
+          border: none; border-radius: 20px; padding: 18px 16px;
+          margin-bottom: 20px; cursor: pointer;
+          box-shadow: 0 4px 20px rgba(52,73,10,0.2);
+          text-align: left; font-family: 'Nunito', sans-serif;
+          transition: transform 0.2s, box-shadow 0.2s;
+          animation: slideUp 0.5s ease 0.15s both;
+        }
+        .miroir-cta-home:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(52,73,10,0.3); }
+        .miroir-cta-home:active { transform: scale(0.98); }
+        .miroir-cta-panda { flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+        .miroir-cta-content { flex: 1; }
+        .miroir-cta-title { font-weight: 800; font-size: 17px; color: white; }
+        .miroir-cta-desc { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 3px; font-weight: 600; }
+        .miroir-cta-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-weight: 700; font-size: 12px; color: #f5eedd; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .miroir-cta-arrow { color: rgba(255,255,255,0.6); font-size: 20px; }
         .app-shell {
           max-width: 430px; margin: 0 auto; min-height: 100vh;
           background: linear-gradient(180deg, #f5f0eb 0%, #f0ede8 40%, #e8f0e4 100%);
@@ -549,8 +621,9 @@ export default function PandaZenApp() {
         .header-logo { display: flex; align-items: center; gap: 10px; }
         .header-panda { font-size: 32px; line-height: 1; }
         .header-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 21px; color: #1e270c; letter-spacing: 0.4px; }
-        .header-avatar { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(91,122,94,0.25); background: linear-gradient(135deg,#e8f0e4,#f5f0eb); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
-        .header-avatar:hover { transform: scale(1.1); }
+        .header-avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(91,122,94,0.4); background: linear-gradient(135deg,#e8f0e4,#f5f0eb); font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 8px rgba(30,39,12,0.1); }
+        .header-avatar:hover { transform: scale(1.1); box-shadow: 0 3px 12px rgba(30,39,12,0.15); }
+        .header-avatar:active { transform: scale(0.95); }
 
         /* ═══ SCREENS ═══ */
         .screen { padding: 20px 16px 70px; }
@@ -580,8 +653,8 @@ export default function PandaZenApp() {
         .home-action-panda { font-size: 40px; line-height: 1; }
         .home-action-text { flex: 1; }
         .home-action-title { font-weight: 800; font-size: 16px; color: #1e270c; }
-        .home-action-desc { font-size: 13px; color: #3a3d3b; margin-top: 3px; font-weight: 600; line-height: 1.4; }
-        .home-galet-badge { background: #f5eedd; border-radius: 20px; padding: 4px 10px; font-weight: 700; font-size: 12px; color: #c9a96e; white-space: nowrap; }
+        .home-action-desc { font-size: 13px; color: #2d2f2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
+        .home-galet-badge { background: #e8dcc6; border: 1px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
         /* ═══ CARDS GENERIC ═══ */
         .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
@@ -635,7 +708,7 @@ export default function PandaZenApp() {
         .avatar-zone { display: flex; flex-direction: column; align-items: center; }
         .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#e8f0e4,#f5f0eb); border: 3px solid rgba(91,122,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 10px; cursor: pointer; position: relative; transition: transform 0.2s; }
         .avatar-circle:hover { transform: scale(1.05); }
-        .avatar-edit-hint { position: absolute; bottom: -2px; right: -2px; background: #34490a; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+        .avatar-edit-hint { position: absolute; bottom: -2px; right: -2px; background: #34490a; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
         .profil-name { font-family: 'Josefin Sans'; font-weight: 700; font-size: 22px; color: #1e270c; cursor: pointer; margin-bottom: 4px; }
         .edit-pen { font-size: 14px; color: #9aaa9c; margin-left: 4px; }
         .name-edit-row { display: flex; gap: 8px; justify-content: center; margin: 6px 0; }
@@ -805,8 +878,8 @@ export default function PandaZenApp() {
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0; border: none; background: transparent; cursor: pointer; transition: transform 0.15s; font-family: 'Nunito'; }
         .nav-btn:active { transform: scale(0.9); }
         .nav-emoji { font-size: 20px; line-height: 1; }
-        .nav-label { font-size: 9px; color: #6b7c6e; }
-        .nav-btn.active .nav-label { color: #34490a; font-weight: 700; }
+        .nav-label { font-size: 10px; color: #2d2f2e; font-weight: 700; }
+        .nav-btn.active .nav-label { color: #34490a; font-weight: 800; }
         .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: #34490a; }
 
         /* ═══ ANIMATIONS ═══ */
@@ -815,7 +888,9 @@ export default function PandaZenApp() {
       `}</style>
 
       <div className="app-shell">
+        {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
         <div className="app-header">
+          <div style={{width: 36}} />
           <div className="header-logo">
             <div className="header-panda">{P.logo}</div>
             <div className="header-title">PANDA ZEN</div>
