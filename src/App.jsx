@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // ═══════════════════════════════════════
 // PANDA ZEN — APP COMPLÈTE v1
@@ -492,14 +492,18 @@ const ProfileScreen = ({ galets, streak }) => {
 // ═══════════════════════════════════════
 const SplashScreen = ({ onDone }) => {
   const [phase, setPhase] = useState(0); // 0=panda, 1=titre, 2=fade-out
+  const doneRef = useRef(false);
+  const finish = () => { if (!doneRef.current) { doneRef.current = true; onDone(); } };
   useEffect(() => {
     const t1 = setTimeout(() => setPhase(1), 2000);
     const t2 = setTimeout(() => setPhase(2), 4000);
-    const t3 = setTimeout(onDone, 4600);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    const t3 = setTimeout(finish, 4600);
+    // Fallback de sécurité — si rien ne se passe après 6s, on ferme quand même
+    const safety = setTimeout(finish, 6000);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(safety); };
   }, []);
   return (
-    <div className={`splash-screen ${phase >= 2 ? "fade-out" : ""}`}>
+    <div className={`splash-screen ${phase >= 2 ? "fade-out" : ""}`} onClick={finish}>
       <div className={`splash-phase1 ${phase >= 1 ? "hide" : ""}`}>
         <div className="splash-panda">{P.original}</div>
       </div>
