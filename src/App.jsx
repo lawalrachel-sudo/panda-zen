@@ -25,6 +25,7 @@ const P = {
   envelope:  pi('enveloppe.png', 'Enveloppe'),
   mudra:     pi('galets_zen_.png', 'Mudrâ'),
   bambou:    pi('HOME_bambou.png', 'Accueil'),
+  pandaGalet: pi('panda_et_galet_gagne_.png', 'Galet gagné'),
 };
 
 // ═══ DONNÉES PROFIL (démo) ═══
@@ -94,12 +95,10 @@ const HomeScreen = ({ galets, streak, onNav }) => {
       {/* MIROIR DU JOUR — CTA PRINCIPAL */}
       <button className="miroir-cta-home" onClick={() => onNav(6)}>
         <div className="miroir-cta-panda">{P.mirror}</div>
-        <div className="miroir-cta-content">
-          <div className="miroir-cta-title">Mon Miroir du jour</div>
-          <div className="miroir-cta-desc">Découvre quel profil tu actives aujourd'hui · 3 min</div>
-        </div>
+        <div className="miroir-cta-title">Mon Miroir du jour</div>
+        <div className="miroir-cta-desc">Découvre quel profil tu actives aujourd'hui · 3 min</div>
         <div className="miroir-cta-badge"><span className="galet-inline">{P.galets}</span> +5</div>
-        <span className="miroir-cta-arrow">→</span>
+        <div className="miroir-cta-btn">C'est parti !</div>
       </button>
       <h3 className="home-section-title">Ton chemin zen</h3>
       {actions.map((a, i) => (
@@ -414,7 +413,7 @@ const ProfileScreen = ({ galets, streak }) => {
       {/* BOX 6 — GALETS */}
       <div className="profil-box" style={{ animationDelay: "0.25s" }}>
         <div className="box-header"><div className="box-panda">{P.galets}</div><div><div className="box-title">Mes galets gagnés</div><div className="box-subtitle">Construis ton équilibre, galet par galet</div></div></div>
-        <div className="galets-summary"><div className="galets-big">{P.galets} {galets}</div><div className="galets-label">galets au total</div></div>
+        <div className="galets-summary"><div className="galets-big">{galets}</div><div className="galets-label">galets au total</div></div>
         <div className="galets-grid">
           <div className="galet-item"><div className="galet-item-val">+2</div><div className="galet-item-label">RESPIRATION</div></div>
           <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">CARTE VITA</div></div>
@@ -423,7 +422,10 @@ const ProfileScreen = ({ galets, streak }) => {
           <div className="galet-item"><div className="galet-item-val">+3</div><div className="galet-item-label">PANDA RELAX</div></div>
           <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">TÉMOIGNAGE</div></div>
         </div>
-        <button className="galets-earn-btn">{P.galets} Clique pour gagner encore des galets aujourd'hui !</button>
+        <button className="galets-earn-btn">
+          <div className="galets-earn-panda">{P.pandaGalet}</div>
+          <div className="galets-earn-text">Clique pour gagner encore des galets aujourd'hui !</div>
+        </button>
         <div className="galets-explain">💡 Tes galets symbolisent ton engagement envers toi-même. Chaque action compte. Invite tes proches pour en gagner davantage !</div>
       </div>
 
@@ -486,21 +488,27 @@ const ProfileScreen = ({ galets, streak }) => {
 };
 
 // ═══════════════════════════════════════
-// SPLASH SCREEN
+// SPLASH SCREEN (style Duolingo)
 // ═══════════════════════════════════════
 const SplashScreen = ({ onDone }) => {
-  const [fadeOut, setFadeOut] = useState(false);
+  const [phase, setPhase] = useState(0); // 0=panda, 1=titre, 2=fade-out
   useEffect(() => {
-    const t = setTimeout(() => setFadeOut(true), 1800);
-    const t2 = setTimeout(onDone, 2400);
-    return () => { clearTimeout(t); clearTimeout(t2); };
+    const t1 = setTimeout(() => setPhase(1), 2000);
+    const t2 = setTimeout(() => setPhase(2), 4000);
+    const t3 = setTimeout(onDone, 4600);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
   return (
-    <div className={`splash-screen ${fadeOut ? "fade-out" : ""}`}>
-      <div className="splash-panda">{P.original}</div>
-      <div className="splash-title">PANDA ZEN</div>
-      <div className="splash-sub">Mieux te comprendre, chaque jour.</div>
-      <div className="splash-credit">Centre VITA®</div>
+    <div className={`splash-screen ${phase >= 2 ? "fade-out" : ""}`}>
+      <div className={`splash-phase1 ${phase >= 1 ? "hide" : ""}`}>
+        <div className="splash-panda">{P.original}</div>
+      </div>
+      <div className={`splash-phase2 ${phase >= 1 && phase < 2 ? "show" : ""}`}>
+        <div className="splash-panda-small">{P.original}</div>
+        <div className="splash-title">PANDA ZEN</div>
+        <div className="splash-sub">Mieux te comprendre, chaque jour.</div>
+        <div className="splash-credit">Centre VITA®</div>
+      </div>
     </div>
   );
 };
@@ -514,6 +522,8 @@ export default function PandaZenApp() {
   const [streak] = useState(3);
   const [showSplash, setShowSplash] = useState(true);
 
+  const goTab = (t) => { setTab(t); window.scrollTo(0, 0); };
+
   const tabs = [
     { id: "home", label: "Accueil", icon: P.bambou },
     { id: "breathe", label: "Respirer", icon: P.breathe },
@@ -525,7 +535,7 @@ export default function PandaZenApp() {
   ];
 
   const screens = [
-    <HomeScreen galets={galets} streak={streak} onNav={setTab} />,
+    <HomeScreen galets={galets} streak={streak} onNav={goTab} />,
     <BreathScreen />,
     <CardScreen />,
     <RelaxScreen />,
@@ -561,47 +571,62 @@ export default function PandaZenApp() {
         .miroir-insight-panda .panda-icon { width: 34px; height: 34px; }
         .avatar-circle .panda-icon { width: 52px; height: 52px; }
         .nav-emoji .panda-icon { width: 26px; height: 26px; }
-        .miroir-cta-panda .panda-icon { width: 56px; height: 56px; }
+        .miroir-cta-panda .panda-icon { width: 64px; height: 64px; }
         .galets-big .panda-icon { width: 36px; height: 36px; }
         .pstat-v .panda-icon { width: 18px; height: 18px; }
         .parrain-v .panda-icon { width: 18px; height: 18px; }
         .filleul-badge .panda-icon { width: 14px; height: 14px; }
-        .splash-panda .panda-icon { width: 140px; height: 140px; }
+        .splash-panda .panda-icon { width: 160px; height: 160px; }
+        .splash-panda-small .panda-icon { width: 80px; height: 80px; }
         .miroir-share .panda-icon { width: 20px; height: 20px; }
+        .galets-earn-panda .panda-icon { width: 80px; height: 80px; }
+        .path-galet-hint .panda-icon { width: 16px; height: 16px; }
+        .path-stat-v .panda-icon { width: 16px; height: 16px; }
 
-        /* ═══ SPLASH SCREEN ═══ */
+        /* ═══ SPLASH SCREEN 2 PHASES (Duolingo style) ═══ */
         .splash-screen {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
-          background: linear-gradient(180deg, #f5f0eb 0%, #e8f0e4 100%);
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          background: #3a5a40;
+          display: flex; align-items: center; justify-content: center;
           transition: opacity 0.6s ease;
         }
         .splash-screen.fade-out { opacity: 0; pointer-events: none; }
-        .splash-panda { animation: splashBounce 0.8s ease 0.3s both; }
-        .splash-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 32px; color: #1e270c; margin-top: 16px; animation: slideUp 0.6s ease 0.6s both; }
-        .splash-sub { font-size: 15px; color: #6b7c6e; margin-top: 8px; animation: slideUp 0.6s ease 0.8s both; }
-        .splash-credit { font-size: 12px; color: #9aaa9c; margin-top: 24px; animation: slideUp 0.6s ease 1s both; }
-        @keyframes splashBounce { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
+        .splash-phase1 {
+          position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .splash-phase1.hide { opacity: 0; transform: scale(0.8); }
+        .splash-panda { animation: splashBounce 0.8s ease 0.2s both; filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3)); }
+        .splash-phase2 {
+          position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          opacity: 0; transform: translateY(20px);
+        }
+        .splash-phase2.show { opacity: 1; transform: translateY(0); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .splash-panda-small { filter: drop-shadow(0 3px 12px rgba(0,0,0,0.2)); }
+        .splash-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 38px; color: #ffffff; margin-top: 16px; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .splash-sub { font-size: 15px; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 600; }
+        .splash-credit { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 24px; }
+        @keyframes splashBounce { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* ═══ MIROIR CTA HOME ═══ */
+        /* ═══ MIROIR CTA HOME (fond blanc, bord doré) ═══ */
         .miroir-cta-home {
-          width: 100%; display: flex; align-items: center; gap: 14px;
-          background: linear-gradient(135deg, #34490a, #3a5a40);
-          border: none; border-radius: 20px; padding: 18px 16px;
+          width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;
+          background: white;
+          border: 2.5px solid #c9a96e;
+          border-radius: 20px; padding: 20px 16px 16px;
           margin-bottom: 20px; cursor: pointer;
-          box-shadow: 0 4px 20px rgba(52,73,10,0.2);
-          text-align: left; font-family: 'Nunito', sans-serif;
+          box-shadow: 0 4px 20px rgba(201,169,110,0.15);
+          text-align: center; font-family: 'Nunito', sans-serif;
           transition: transform 0.2s, box-shadow 0.2s;
           animation: slideUp 0.5s ease 0.15s both;
         }
-        .miroir-cta-home:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(52,73,10,0.3); }
+        .miroir-cta-home:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(201,169,110,0.25); }
         .miroir-cta-home:active { transform: scale(0.98); }
-        .miroir-cta-panda { flex-shrink: 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-        .miroir-cta-content { flex: 1; }
-        .miroir-cta-title { font-weight: 800; font-size: 17px; color: white; }
-        .miroir-cta-desc { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 3px; font-weight: 600; }
-        .miroir-cta-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 10px; font-weight: 700; font-size: 12px; color: #f5eedd; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
-        .miroir-cta-arrow { color: rgba(255,255,255,0.6); font-size: 20px; }
+        .miroir-cta-panda { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1)); }
+        .miroir-cta-title { font-weight: 800; font-size: 18px; color: #1e270c; }
+        .miroir-cta-desc { font-size: 13px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
+        .miroir-cta-badge { background: #f5eedd; border: 1.5px solid #d4b87a; border-radius: 20px; padding: 4px 12px; font-weight: 700; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+        .miroir-cta-btn { margin-top: 8px; background: #3a5a40; color: white; border: none; border-radius: 12px; padding: 10px 32px; font-weight: 800; font-size: 14px; letter-spacing: 0.3px; }
         .app-shell {
           max-width: 430px; margin: 0 auto; min-height: 100vh;
           background: linear-gradient(180deg, #f5f0eb 0%, #f0ede8 40%, #e8f0e4 100%);
@@ -626,13 +651,13 @@ export default function PandaZenApp() {
         .header-avatar:active { transform: scale(0.95); }
 
         /* ═══ SCREENS ═══ */
-        .screen { padding: 20px 16px 70px; }
+        .screen { padding: 20px 16px 20px; }
         .center-screen { text-align: center; }
 
         /* ═══ TYPOGRAPHY ═══ */
         .title-lg { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 24px; color: #1e270c; }
         .section-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 18px; color: #1e270c; margin-bottom: 14px; }
-        .tagline-sm { font-size: 14px; color: #6b7c6e; margin-top: 4px; line-height: 1.4; }
+        .tagline-sm { font-size: 15px; color: #3a5a40; margin-top: 4px; line-height: 1.4; font-weight: 600; }
 
         /* ═══ HOME v2 ═══ */
         .home-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; animation: slideUp 0.5s ease both; }
@@ -645,7 +670,7 @@ export default function PandaZenApp() {
         .home-stat-val { font-weight: 800; font-size: 28px; }
         .home-stat-val.gold { color: #c9a96e; }
         .home-stat-val.orange { color: #d4845a; }
-        .home-stat-label { font-size: 12px; color: #3a3d3b; margin-top: 2px; font-weight: 700; }
+        .home-stat-label { font-size: 13px; color: #2d3a2e; margin-top: 2px; font-weight: 700; }
         .home-section-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 20px; color: #1e270c; margin-bottom: 14px; }
         .home-action { width: 100%; display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.93); border: none; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(30,39,12,0.05); text-align: left; font-family: 'Nunito', sans-serif; transition: transform 0.2s, box-shadow 0.2s; animation: slideUp 0.4s ease both; }
         .home-action:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(30,39,12,0.1); }
@@ -653,8 +678,8 @@ export default function PandaZenApp() {
         .home-action-panda { font-size: 40px; line-height: 1; }
         .home-action-text { flex: 1; }
         .home-action-title { font-weight: 800; font-size: 16px; color: #1e270c; }
-        .home-action-desc { font-size: 13px; color: #2d2f2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
-        .home-galet-badge { background: #e8dcc6; border: 1px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+        .home-action-desc { font-size: 13px; color: #2d3a2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
+        .home-galet-badge { background: #f5f0eb; border: 1.5px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
         /* ═══ CARDS GENERIC ═══ */
         .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
@@ -666,7 +691,7 @@ export default function PandaZenApp() {
         .module-card { background: rgba(255,255,255,0.93); border-radius: 24px; padding: 40px 24px; box-shadow: 0 4px 20px rgba(30,39,12,0.07); }
         .module-panda { font-size: 80px; line-height: 1; margin-bottom: 16px; }
         .module-panda.big { font-size: 100px; }
-        .module-desc { font-size: 15px; color: #6b7c6e; line-height: 1.6; margin: 10px 0 20px; }
+        .module-desc { font-size: 15px; color: #2d3a2e; line-height: 1.6; margin: 10px 0 20px; font-weight: 600; }
         .phase-badge { background: rgba(91,122,94,0.08); border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #5b7a5e; font-weight: 600; }
 
         /* ═══ WATER ═══ */
@@ -703,8 +728,8 @@ export default function PandaZenApp() {
         .profil-box { background: rgba(255,255,255,0.93); border-radius: 20px; margin-bottom: 14px; padding: 20px; box-shadow: 0 2px 14px rgba(30,39,12,0.06); animation: slideUp 0.4s ease both; }
         .box-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
         .box-panda { font-size: 40px; line-height: 1; }
-        .box-title { font-family: 'Josefin Sans'; font-weight: 700; font-size: 17px; color: #1e270c; }
-        .box-subtitle { font-size: 12px; color: #6b7c6e; margin-top: 2px; }
+        .box-title { font-family: 'Josefin Sans'; font-weight: 700; font-size: 18px; color: #1e270c; }
+        .box-subtitle { font-size: 13px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
         .avatar-zone { display: flex; flex-direction: column; align-items: center; }
         .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#e8f0e4,#f5f0eb); border: 3px solid rgba(91,122,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 10px; cursor: pointer; position: relative; transition: transform 0.2s; }
         .avatar-circle:hover { transform: scale(1.05); }
@@ -719,7 +744,7 @@ export default function PandaZenApp() {
         .pstat-v { font-weight: 800; font-size: 18px; }
         .pstat-v.gold { color: #c9a96e; }
         .pstat-v.orange { color: #d4845a; }
-        .pstat-l { font-size: 11px; color: #6b7c6e; }
+        .pstat-l { font-size: 12px; color: #3a5a40; font-weight: 600; }
         .pstat-div { width: 1px; height: 28px; background: rgba(154,170,156,0.2); }
 
         /* MIROIR */
@@ -728,15 +753,15 @@ export default function PandaZenApp() {
         .miroir-animal { font-size: 48px; margin-bottom: 6px; }
         .miroir-name { font-family: 'Josefin Sans'; font-weight: 700; font-size: 20px; color: #1e270c; }
         .miroir-letter { font-size: 13px; color: #6b7c6e; margin-top: 2px; }
-        .miroir-insight { margin-top: 14px; padding: 14px; background: rgba(255,255,255,0.7); border-radius: 12px; text-align: left; font-size: 13px; line-height: 1.6; color: #2d2f2e; }
+        .miroir-insight { margin-top: 14px; padding: 14px; background: rgba(255,255,255,0.7); border-radius: 12px; text-align: left; font-size: 14px; line-height: 1.6; color: #2d2f2e; font-weight: 600; }
         .miroir-insight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .miroir-insight-panda { font-size: 28px; line-height: 1; }
-        .miroir-insight-title { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .miroir-insight-title { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         .miroir-insight-title.up { color: #3a5a40; }
         .miroir-insight-title.down { color: #a0604a; }
-        .miroir-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-        .tag-plus { background: rgba(91,122,94,0.12); color: #3a5a40; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
-        .tag-minus { background: rgba(192,120,90,0.12); color: #a0604a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; }
+        .miroir-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .tag-plus { flex: 1; min-width: calc(50% - 4px); background: rgba(91,122,94,0.12); color: #3a5a40; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
+        .tag-minus { flex: 1; min-width: calc(50% - 4px); background: rgba(192,120,90,0.12); color: #a0604a; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
         .miroir-btns { display: flex; gap: 8px; margin-top: 16px; }
         .miroir-cta { flex: 1; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
         .miroir-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(52,73,10,0.2); }
@@ -749,10 +774,10 @@ export default function PandaZenApp() {
         .relation-item:last-child { border-bottom: none; }
         .relation-top { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; background: none; border: none; font-family: 'Nunito'; text-align: left; padding: 0; }
         .relation-top:hover { opacity: 0.85; }
-        .rel-animal { font-size: 24px; }
+        .rel-animal { font-size: 28px; }
         .rel-info { flex: 1; }
-        .rel-label { font-weight: 700; font-size: 14px; color: #2d2f2e; }
-        .rel-meta { font-size: 11px; color: #6b7c6e; }
+        .rel-label { font-weight: 800; font-size: 16px; color: #1e270c; }
+        .rel-meta { font-size: 13px; color: #3a5a40; font-weight: 600; margin-top: 2px; }
         .rel-star { font-size: 18px; }
         .rel-arrow { font-size: 14px; color: #9aaa9c; transition: transform 0.2s; }
         .rel-arrow.open { transform: rotate(90deg); }
@@ -809,26 +834,28 @@ export default function PandaZenApp() {
         .progress-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#5b7a5e,#c9a96e); transition: width 0.6s ease; }
         .path-stats { display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
         .path-stat { text-align: center; }
-        .path-stat-v { font-weight: 800; font-size: 16px; color: #3a5a40; }
-        .path-stat-l { font-size: 10px; color: #6b7c6e; }
+        .path-stat-v { font-weight: 800; font-size: 16px; color: #3a5a40; display: flex; align-items: center; gap: 4px; }
+        .path-stat-l { font-size: 11px; color: #3a5a40; font-weight: 600; }
         .path-cta { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s; }
         .path-cta:hover { transform: translateY(-1px); }
         .path-cta:active { transform: scale(0.98); }
-        .path-galet-hint { margin-top: 10px; padding: 10px; background: rgba(201,169,110,0.1); border-radius: 10px; font-size: 12px; color: #6b7c6e; text-align: center; }
+        .path-galet-hint { margin-top: 10px; padding: 12px; background: rgba(201,169,110,0.1); border-radius: 10px; font-size: 13px; color: #3a5a40; text-align: center; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .path-credit { margin-top: 10px; font-size: 11px; color: #9aaa9c; text-align: center; font-style: italic; }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         /* GALETS */
         .galets-summary { text-align: center; padding: 10px 0; }
         .galets-big { font-size: 36px; font-weight: 800; color: #c9a96e; }
-        .galets-label { font-size: 13px; color: #6b7c6e; margin-top: 2px; }
+        .galets-label { font-size: 14px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
         .galets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
         .galet-item { background: rgba(201,169,110,0.12); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(201,169,110,0.2); }
         .galet-item-val { font-weight: 800; font-size: 16px; color: #c9a96e; }
         .galet-item-label { font-size: 11px; color: #5a4a3a; margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
-        .galets-earn-btn { display: block; width: 100%; margin-top: 12px; background: linear-gradient(135deg,#c9a96e,#b89860); color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 3px 12px rgba(201,169,110,0.3); }
-        .galets-earn-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(201,169,110,0.4); }
+        .galets-earn-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin-top: 12px; background: transparent; border: none; padding: 10px; font-family: 'Nunito'; cursor: pointer; transition: transform 0.15s; }
+        .galets-earn-btn:hover { transform: translateY(-2px); }
         .galets-earn-btn:active { transform: scale(0.98); }
+        .galets-earn-panda { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.1)); }
+        .galets-earn-text { font-weight: 700; font-size: 14px; color: #3a5a40; line-height: 1.4; }
         .galets-explain { margin-top: 14px; padding: 12px; background: rgba(160,130,90,0.12); border-radius: 12px; font-size: 13px; color: #5a4a3a; line-height: 1.5; }
 
         /* PARRAINAGE */
@@ -872,7 +899,7 @@ export default function PandaZenApp() {
         .menu-arrow { color: #9aaa9c; font-size: 16px; }
 
         /* ═══ FOOTER LÉGER ═══ */
-        .app-footer-legal { text-align: center; padding: 6px 0 60px; font-size: 10px; color: #9aaa9c; }
+        .app-footer-legal { text-align: center; padding: 16px 0 80px; font-size: 10px; color: #9aaa9c; }
         /* ═══ NAVIGATION ═══ */
         .app-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(154,170,156,0.1); display: flex; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); z-index: 100; }
         .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0; border: none; background: transparent; cursor: pointer; transition: transform 0.15s; font-family: 'Nunito'; }
@@ -895,7 +922,7 @@ export default function PandaZenApp() {
             <div className="header-panda">{P.logo}</div>
             <div className="header-title">PANDA ZEN</div>
           </div>
-          <button className="header-avatar" onClick={() => setTab(6)}>👤</button>
+          <button className="header-avatar" onClick={() => goTab(6)}>👤</button>
         </div>
 
         {screens[tab]}
@@ -903,7 +930,7 @@ export default function PandaZenApp() {
 
         <div className="app-nav">
           {tabs.filter(t => t.id !== "profile").map((t, i) => (
-            <button key={t.id} className={`nav-btn ${tab===i?"active":""}`} onClick={() => setTab(i)}>
+            <button key={t.id} className={`nav-btn ${tab===i?"active":""}`} onClick={() => goTab(i)}>
               <span className="nav-emoji">{t.icon}</span>
               <span className="nav-label">{t.label}</span>
               {tab===i && <div className="nav-dot" />}
