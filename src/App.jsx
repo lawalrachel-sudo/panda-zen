@@ -524,11 +524,10 @@ const BreathScreen = ({ galets, setGalets, onNav }) => {
         setCurrentStepIndex(nextIndex);
         setTimeLeft(selectedExercise.steps[nextIndex].time);
       } else {
-        setIsTimerRunning(false);
-        if (!completedExercises[selectedExercise.id]) {
-          setGalets(g => g + 2);
-          setCompletedExercises(prev => ({ ...prev, [selectedExercise.id]: true }));
-        }
+        // Fin de tous les steps → BOUCLE (recommence)
+        setCurrentStepIndex(0);
+        setTimeLeft(selectedExercise.steps[0].time);
+        // Le timer continue de tourner (pas de setIsTimerRunning(false))
       }
     }
   }, [timeLeft, isTimerRunning, currentStepIndex, selectedExercise, completedExercises, setGalets]);
