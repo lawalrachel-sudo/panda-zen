@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 // ═══════════════════════════════════════
 // PANDA ZEN — APP COMPLÈTE v1
 // Fusion skeleton-v3 + profil-v5
-// 16/02/2026
+// 17/02/2026 — Fix boucle respiration 1min
 // ═══════════════════════════════════════
 
 // PNG pandas transparents dans /images/
