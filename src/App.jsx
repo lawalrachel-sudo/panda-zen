@@ -688,7 +688,16 @@ const BreathScreen = ({ galets, setGalets, onNav }) => {
         <div className="breath-timer-zone">
           {!isCompleted ? (
             <>
-              <div className="breath-timer-circle">
+             <div className="breath-timer-circle" style={{
+                transform: currentStep.phase.toLowerCase().includes('inspir') 
+                  ? `scale(${1 + (currentStep.time - timeLeft) / currentStep.time * 0.2})`
+                  : currentStep.phase.toLowerCase().includes('expir')
+                  ? `scale(${1.2 - (currentStep.time - timeLeft) / currentStep.time * 0.2})`
+                  : currentStep.phase.toLowerCase().includes('rétention') && currentStepIndex > 0 && selectedExercise.steps[currentStepIndex - 1].phase.toLowerCase().includes('inspir')
+                  ? 'scale(1.2)'
+                  : 'scale(1.0)',
+                transition: 'transform 0.3s ease-out'
+              }}>
                 <div className="breath-timer-time">{timeLeft}s</div>
                 <div className="breath-timer-phase">{currentStep.phase}</div>
               </div>
@@ -1435,9 +1444,9 @@ export default function PandaZenApp() {
         .breath-progress-label { font-size: 12px; color: #9aaa9c; text-align: center; margin-bottom: 20px; }
         .breath-timer-zone { text-align: center; margin-bottom: 20px; }
         .breath-timer-circle { width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(135deg, #f5f0eb 0%, #e8dfd6 100%); margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .breath-timer-time { font-size: 44px; font-weight: 700; color: #3a5a40; font-family: 'Josefin Sans', sans-serif; }
-        .breath-timer-phase { font-size: 14px; color: #6b7c6e; margin-top: 6px; font-weight: 500; }
-        .breath-timer-desc { font-size: 14px; color: #6b7c6e; margin-bottom: 16px; line-height: 1.5; }
+       .breath-timer-time { font-size: 24px; font-weight: 600; color: #9aaa9c; font-family: 'Nunito', sans-serif; margin-top: 8px; }
+        .breath-timer-phase { font-size: 32px; color: #3a5a40; margin-bottom: 0; font-weight: 700; font-family: 'Josefin Sans', sans-serif; }
+        .breath-timer-desc { font-size: 13px; color: #9aaa9c; margin-bottom: 16px; line-height: 1.5; margin-top: 4px; }
         .breath-timer-btns { display: flex; gap: 12px; justify-content: center; }
         .breath-timer-btn { border: none; border-radius: 12px; padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .breath-timer-btn.primary { background: #3a5a40; color: white; }
