@@ -698,11 +698,17 @@ const BreathScreen = ({ galets, setGalets, onNav }) => {
                   : 'scale(1.0)',
                 transition: 'transform 0.3s ease-out'
               }}>
-                <div className="breath-timer-time">{timeLeft}s</div>
-                <div className="breath-timer-phase">{currentStep.phase}</div>
+              </div>
+              <div className="breath-timer-info">
+                <div className="breath-timer-main-text">
+                  <span className="breath-timer-phase-big">{currentStep.phase}</span>
+                  <span className="breath-timer-time-inline"> — {timeLeft}s</span>
+                </div>
               </div>
               <p className="breath-timer-desc">{currentStep.desc}</p>
-              <div className="breath-timer-btns">
+            </div>
+            <div className="breath-timer-btns">
+</div>
                 <button className="breath-timer-btn primary" onClick={toggleTimer}>
                   {isTimerRunning ? "⏸ Pause" : "▶ Démarrer"}
                 </button>
