@@ -1449,6 +1449,11 @@ export default function PandaZenApp() {
         .breath-progress-fill { background: linear-gradient(90deg, #3a5a40, #5b7a5e); height: 100%; transition: width 0.3s; }
         .breath-progress-label { font-size: 12px; color: #9aaa9c; text-align: center; margin-bottom: 20px; }
         .breath-timer-zone { text-align: center; margin-bottom: 20px; }
+        .breath-timer-info { margin-bottom: 20px; }
+        .breath-timer-main-text { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 8px; }
+        .breath-timer-phase-big { font-size: 28px; font-weight: 700; color: #3a5a40; font-family: 'Josefin Sans', sans-serif; }
+        .breath-timer-time-inline { font-size: 24px; font-weight: 600; color: #9aaa9c; font-family: 'Nunito', sans-serif; }
+        .breath-timer-desc { font-size: 14px; color: #6b7c6e; margin-bottom: 20px; line-height: 1.5; text-align: center; }
         .breath-timer-circle { width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(135deg, #d1e7f0 0%, #b8dae8 100%); margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .breath-timer-btns { display: flex; gap: 12px; justify-content: center; }
         .breath-timer-btn { border: none; border-radius: 12px; padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
