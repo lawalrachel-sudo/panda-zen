@@ -690,9 +690,9 @@ const BreathScreen = ({ galets, setGalets, onNav }) => {
             <>
              <div className="breath-timer-circle" style={{
                 transform: currentStep.phase.toLowerCase().includes('inspir') 
-                  ? `scale(${1 + (currentStep.time - timeLeft) / currentStep.time * 0.2})`
+                  ? `scale(${1 + (1 - timeLeft / currentStep.time) * 0.2})`
                   : currentStep.phase.toLowerCase().includes('expir')
-                  ? `scale(${1.2 - (currentStep.time - timeLeft) / currentStep.time * 0.2})`
+                  ? `scale(${1.2 - (1 - timeLeft / currentStep.time) * 0.2})`
                   : currentStep.phase.toLowerCase().includes('rétention') && currentStepIndex > 0 && selectedExercise.steps[currentStepIndex - 1].phase.toLowerCase().includes('inspir')
                   ? 'scale(1.2)'
                   : 'scale(1.0)',
