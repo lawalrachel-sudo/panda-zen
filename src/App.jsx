@@ -77,7 +77,7 @@ const HomeScreen = ({ galets, streak, onNav }) => {
     { p: P.relax, t: "Panda Relax", d: "16 animaux totems pour t'accompagner dans les 64 exercices", tab: 3, g: 3 },
     { p: P.breathe, t: "Respiration", d: "Des exercices adaptés selon ton profil", tab: 1, g: 2 },
     { p: P.couple, t: "Relations", d: "Découvre ton profil dans tes relations", tab: 5, g: 5 },
-    { p: P.water, t: "Hydratation", d: "Mieux comprendre, mieux s'hydrater", tab: 4, g: 1 },
+    { p: P.water, t: "Hydratation", d: "S'hydrater pour éliminer", tab: 4, g: 1 },
   ];
   return (
     <div className="screen">
@@ -137,8 +137,8 @@ const CardScreen = () => (
     <div className="module-card fade-in">
       <div className="module-panda big">{P.cards}</div>
       <h2 className="title-lg">Carte VITA du jour</h2>
-      <p className="module-desc">72 cartes VITA® — 3 niveaux bambou : Feuille, Nœud, Racine.</p>
-      <div className="phase-badge">⏳ Tirage 2 cartes/jour à intégrer</div>
+      <p className="module-desc">72 cartes VITA®<br/>3 niveaux de lecture<br/>Bambou : Feuille, Nœud, Racine.</p>
+      <div className="phase-badge">Tirage 1 ou 2 cartes VITA/jour à comprendre et intégrer.</div>
     </div>
   </div>
 );
@@ -151,7 +151,7 @@ const RelaxScreen = () => (
     <div className="module-card fade-in">
       <div className="module-panda big">{P.relax}</div>
       <h2 className="title-lg">Panda Relax</h2>
-      <p className="module-desc">16 animaux totems · 64 exercices corps & émotions.<br/>Découvre ton animal et laisse-toi guider.</p>
+      <p className="module-desc">16 animaux totems · 64 exercices corps & émotions.<br/>Découvre ton animal totem et laisse-toi guider.</p>
       <div className="phase-badge">⏳ 16 fiches exercices à intégrer</div>
     </div>
   </div>
@@ -162,21 +162,40 @@ const RelaxScreen = () => (
 // ═══════════════════════════════════════
 const WaterScreen = ({ galets, setGalets }) => {
   const [glasses, setGlasses] = useState(0);
-  const [goal, setGoal] = useState(8);
-  const [editGoal, setEditGoal] = useState(false);
+  const [goalMl, setGoalMl] = useState(1600); // 1L à 2L par défaut 1.6L
+  const glassSize = 200; // ml par verre
+  const goal = Math.round(goalMl / glassSize);
+  const [showInfo, setShowInfo] = useState(false);
   const pct = Math.min(100, Math.round((glasses / goal) * 100));
   const weekData = [5, 7, 8, 6, 4, 8];
   const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-  const add = () => { if (glasses < 20) { setGlasses(g => g + 1); setGalets(g => g + 1); }};
+  const [galetEarned, setGaletEarned] = useState({g70:false, g100:false});
+  const [reminderStart, setReminderStart] = useState(8);
+  const [reminderEnd, setReminderEnd] = useState(20);
+  const goalOptions = [1000, 1200, 1400, 1600, 1800, 2000];
+  const add = () => {
+    if (glasses >= goal) return;
+    const next = glasses + 1;
+    setGlasses(next);
+    const nextPct = Math.round((next / goal) * 100);
+    if (nextPct >= 70 && !galetEarned.g70) { setGalets(g => g + 1); setGaletEarned(e => ({...e, g70:true})); }
+    if (nextPct >= 100 && !galetEarned.g100) { setGalets(g => g + 2); setGaletEarned(e => ({...e, g100:true})); }
+  };
   return (
     <div className="screen">
       <div className="water-header">
         <div className="water-panda">{pct >= 100 ? P.thumbsUp : P.water}</div>
         <div>
           <h2 className="title-lg">Hydratation</h2>
-          <p className="tagline-sm">{pct >= 100 ? "🎉 Objectif atteint ! Bravo !" : "Mieux comprendre, mieux s'hydrater."}</p>
+          <p className="tagline-sm">{pct >= 100 ? "Objectif atteint ! Bravo !" : "S'hydrater pour éliminer."}</p>
         </div>
       </div>
+      <button className="water-info-toggle" onClick={() => setShowInfo(!showInfo)}>{showInfo ? "▼" : "▶"} Pourquoi c'est important ?</button>
+      {showInfo && (
+        <div className="water-info-text fade-in">
+          L'eau représente 60% de ton corps. Une bonne hydratation améliore ta concentration, ton humeur et ta digestion. Adapte ton objectif à ta morphologie et tes activités. Le rappel te permet de répartir tes verres sur la journée.
+        </div>
+      )}
       <div className="water-main fade-in">
         <div className="circle-wrap">
           <svg className="circle-svg" viewBox="0 0 180 180">
@@ -191,22 +210,78 @@ const WaterScreen = ({ galets, setGalets }) => {
         <div className="water-btns">
           <button className="water-minus" onClick={() => glasses > 0 && setGlasses(g => g - 1)}>−</button>
           <button className="water-plus" onClick={add}>+</button>
-          <div className="home-galet-badge">{P.galets} +1</div>
         </div>
       </div>
-      <div className="card fade-in" style={{ animationDelay: "0.1s" }}>
-        <div className="card-header">
-          <span className="card-title-sm">Mon objectif</span>
-          <button className="link-btn" onClick={() => setEditGoal(!editGoal)}>{editGoal ? "Fermer" : "Modifier"}</button>
+
+      {/* OBJECTIF + GALETS */}
+      <div className="card water-goal-card fade-in" style={{ animationDelay: "0.05s" }}>
+        <span className="card-title-sm">Mon objectif : {goalMl/1000}L ({goal} verres de {glassSize}ml)</span>
+        <div className="goal-options">
+          {goalOptions.map(ml => (
+            <button key={ml} className={`goal-btn ${goalMl===ml?"active":""}`} onClick={() => { setGoalMl(ml); setGlasses(0); setGaletEarned({g70:false,g100:false}); }}>{ml/1000}L</button>
+          ))}
         </div>
-        {editGoal && (
-          <div className="goal-options">
-            {[6,7,8,9,10,12].map(n => (
-              <button key={n} className={`goal-btn ${goal===n?"active":""}`} onClick={() => {setGoal(n);setEditGoal(false);}}>{n} verres</button>
-            ))}
+        <div className="water-galet-rewards">
+          <div className={`water-reward-row ${galetEarned.g70 ? "earned" : ""}`}>
+            <span className="water-reward-label">Objectif 70%</span>
+            <span className="water-reward-val"><span className="galet-inline">{P.galets}</span> ×1 {galetEarned.g70 && <span className="water-check">✓</span>}</span>
           </div>
-        )}
+          <div className={`water-reward-row ${galetEarned.g100 ? "earned" : ""}`}>
+            <span className="water-reward-label">Objectif 100%</span>
+            <span className="water-reward-val"><span className="galet-inline">{P.galets}</span> ×2 {galetEarned.g100 && <span className="water-check">✓</span>}</span>
+          </div>
+        </div>
       </div>
+
+      {/* CTA MODULE */}
+      <button className="water-module-cta fade-in" style={{ animationDelay: "0.1s" }}>
+        💧 Mieux comprendre, mieux s'hydrater
+      </button>
+
+      {/* RAPPELS */}
+      <div className="card fade-in" style={{ animationDelay: "0.12s" }}>
+        <span className="card-title-sm">🔔 Rappels hydratation</span>
+        <p className="water-reminder-desc">Reçois un rappel pour boire régulièrement. On fragmente ton objectif sur ta journée.</p>
+        <div className="water-reminder-config">
+          <div className="reminder-row">
+            <span className="reminder-label">De</span>
+            <select className="reminder-select" value={reminderStart} onChange={e => setReminderStart(+e.target.value)}>
+              {[6,7,8,9,10].map(h => <option key={h} value={h}>{h}h00</option>)}
+            </select>
+            <span className="reminder-label">à</span>
+            <select className="reminder-select" value={reminderEnd} onChange={e => setReminderEnd(+e.target.value)}>
+              {[18,19,20,21,22].map(h => <option key={h} value={h}>{h}h00</option>)}
+            </select>
+          </div>
+          <p className="reminder-calc">
+            {goal} verres en {reminderEnd - reminderStart}h = 1 rappel toutes les {Math.round((reminderEnd - reminderStart) * 60 / goal)} min
+          </p>
+        </div>
+        <button className="water-reminder-btn" onClick={() => {
+          const interval = Math.round((reminderEnd - reminderStart) * 60 / goal);
+          const now = new Date();
+          const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+          let events = '';
+          for (let i = 0; i < goal; i++) {
+            const totalMin = reminderStart * 60 + i * interval;
+            const hh = String(Math.floor(totalMin/60)).padStart(2,'0');
+            const mm = String(totalMin%60).padStart(2,'0');
+            events += `BEGIN:VEVENT\nDTSTART:${y}${m}${d}T${hh}${mm}00\nDTSTAMP:${y}${m}${d}T${hh}${mm}00\nDURATION:PT1M\nSUMMARY:💧 Verre ${i+1}/${goal} — Panda Zen\nDESCRIPTION:C'est l'heure de boire ! Objectif : ${goalMl/1000}L aujourd'hui.\nBEGIN:VALARM\nTRIGGER:PT0M\nACTION:DISPLAY\nDESCRIPTION:Bois un verre d eau\nEND:VALARM\nEND:VEVENT\n`;
+          }
+          const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PandaZen//Hydratation//FR\nCALSCALE:GREGORIAN\n${events}END:VCALENDAR`;
+          const blob = new Blob([ics], { type: 'text/calendar' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = `panda-zen-hydratation-${y}${m}${d}.ics`;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }}>
+          📲 Ajouter les rappels à mon calendrier
+        </button>
+        <p className="reminder-note">Fonctionne sur iPhone et Android. Les rappels s'ajoutent à ton calendrier avec notification sonore.</p>
+      </div>
+
+      {/* GRAPHIQUE SEMAINE */}
       <div className="card fade-in" style={{ animationDelay: "0.15s" }}>
         <span className="card-title-sm">Ma semaine</span>
         <div className="week-bars">
@@ -235,7 +310,7 @@ const RelationsPlaceholder = () => (
     <div className="module-card fade-in">
       <div className="module-panda big">{P.couple}</div>
       <h2 className="title-lg">Mon profil en Relation</h2>
-      <p className="module-desc">Découvre quel profil tu actives avec chaque personne de ton entourage.<br/>1ère relation gratuite — les suivantes en version Premium.</p>
+      <p className="module-desc">Découvre quel profil tu actives avec chaque personne de ton entourage.</p>
       <div className="phase-badge">⏳ Module profil relationnel v6 à intégrer</div>
     </div>
   </div>
@@ -292,17 +367,17 @@ const ProfileScreen = ({ galets, streak }) => {
           <div className="miroir-name">{mirrorProfile.name}</div>
           <div className="miroir-letter">Profil {mirrorProfile.letter}</div>
           <div className="miroir-insight" style={{ marginTop: 14 }}>
-            <div className="miroir-insight-header"><span className="miroir-insight-panda">{P.mirror}</span><div className="miroir-insight-title up">✨ Ce qui te tire vers le haut aujourd'hui</div></div>
+            <div className="miroir-insight-header"><span className="miroir-insight-panda-lg">{P.mirror}</span><div className="miroir-insight-title up">✨ Ce qui te tire vers le haut aujourd'hui</div></div>
             <div className="miroir-tags">{mirrorProfile.forceP.split(", ").map((f,i) => <span key={`p${i}`} className="tag-plus">✨ {f}</span>)}</div>
           </div>
           <div className="miroir-insight" style={{ marginTop: 8 }}>
-            <div className="miroir-insight-header"><span className="miroir-insight-panda">{P.mirrorNeg}</span><div className="miroir-insight-title down">🌒 En stress, attention à...</div></div>
+            <div className="miroir-insight-header"><span className="miroir-insight-panda-lg">{P.mirrorNeg}</span><div className="miroir-insight-title down">🌒 En stress, attention à...</div></div>
             <div className="miroir-tags">{mirrorProfile.forceN.split(", ").map((f,i) => <span key={`n${i}`} className="tag-minus">🌒 {f}</span>)}</div>
           </div>
         </div>
-        <div className="miroir-btns">
-          <button className="miroir-cta">Découvrir mon Miroir — 3 min</button>
-          <button className="miroir-share" title="Partager mon Miroir du jour">✉️</button>
+        <div className="miroir-btns-5050">
+          <button className="miroir-cta-half">Découvrir<br/>mon Miroir — 3 min</button>
+          <button className="miroir-share-half">{P.envelope} Je partage !</button>
         </div>
       </div>
 
@@ -357,7 +432,7 @@ const ProfileScreen = ({ galets, streak }) => {
             <div key={c.num}>
               <div className="carte-item" onClick={() => setOpenCard(isOpen ? null : c.num)}>
                 <div className="carte-dos">{c.num}</div>
-                <div className="carte-phrase">"{c.phrase}"</div>
+                <div className="carte-phrase"><em><strong>"{c.phrase}"</strong></em></div>
                 <span className={`rel-arrow ${isOpen?"open":""}`}>›</span>
               </div>
               {isOpen && (
@@ -375,7 +450,11 @@ const ProfileScreen = ({ galets, streak }) => {
 
       {/* BOX 5 — CHEMIN MUDRÂS */}
       <div className="profil-box" style={{ animationDelay: "0.22s" }}>
-        <div className="box-header"><div className="box-panda">{P.mudra}</div><div><div className="box-title">Mon chemin Mudrâs</div><div className="box-subtitle">73 pas. 18 mudrâs. Un chemin vers soi.</div></div></div>
+        <div className="box-header-vertical">
+          <div className="box-panda-lg">{P.mudra}</div>
+          <div className="box-title">Mon chemin Mudrâs</div>
+          <div className="box-subtitle">73 pas · 18 mudrâs · Un chemin vers soi.</div>
+        </div>
         <div className="path-container">
           <div className="stepping-stones">
             {Array.from({ length: 73 }, (_, i) => {
@@ -394,7 +473,6 @@ const ProfileScreen = ({ galets, streak }) => {
             <div className="legend-item"><div className="legend-dot green" /> Parcouru</div>
             <div className="legend-item"><div className="legend-dot gold" /> Aujourd'hui</div>
             <div className="legend-item"><div className="legend-dot gray" /> À venir</div>
-            <div className="legend-item">🙏 Mudrâ</div>
           </div>
         </div>
         <div className="path-progress">
@@ -406,8 +484,7 @@ const ProfileScreen = ({ galets, streak }) => {
           </div>
         </div>
         <div className="path-galet-hint">{P.galets} +1 galet pour chaque jour de pratique entre deux mudrâs</div>
-        <button className="path-cta">🙏 Voir mes mudrâs reçus</button>
-        <div className="path-credit">Transmis avec gratitude, d'après Jacqueline (2016) 🙏</div>
+        <button className="path-cta-violet">Voir mes mudrâs reçus</button>
       </div>
 
       {/* BOX 6 — GALETS */}
@@ -423,7 +500,7 @@ const ProfileScreen = ({ galets, streak }) => {
           <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">TÉMOIGNAGE</div></div>
         </div>
         <button className="galets-earn-btn">
-          <div className="galets-earn-panda">{P.pandaGalet}</div>
+          <div className="galets-earn-panda pulse">{P.pandaGalet}</div>
           <div className="galets-earn-text">Clique pour gagner encore des galets aujourd'hui !</div>
         </button>
         <div className="galets-explain">💡 Tes galets symbolisent ton engagement envers toi-même. Chaque action compte. Invite tes proches pour en gagner davantage !</div>
@@ -431,7 +508,7 @@ const ProfileScreen = ({ galets, streak }) => {
 
       {/* BOX 7 — PARRAINAGE */}
       <div className="profil-box" style={{ animationDelay: "0.3s" }}>
-        <div className="box-header"><div className="box-panda">{P.envelope}</div><div><div className="box-title">Parrainage</div><div className="box-subtitle">Invite tes proches, gagne des galets</div></div></div>
+        <div className="box-header"><div className="box-panda">{P.envelope}</div><div><div className="box-title">Parrainage</div><div className="box-subtitle">Invite tes proches, gagne des galets !</div></div></div>
         <div className="parrain-stats">
           <div className="parrain-stat"><div className="parrain-v">{DEMO_FILLEULS.length}</div><div className="parrain-l">filleuls</div></div>
           <div className="parrain-stat"><div className="parrain-v gold">{P.galets} {DEMO_FILLEULS.reduce((s,f) => s+f.galets,0)}</div><div className="parrain-l">galets gagnés</div></div>
@@ -456,20 +533,22 @@ const ProfileScreen = ({ galets, streak }) => {
 
       {/* BOX BONUS */}
       <div className="profil-box bonus-box" style={{ animationDelay: "0.35s" }}>
-        <div className="box-header"><div className="box-panda">⭐</div><div><div className="box-title">Bonus</div><div className="box-subtitle">Ressources, contact & partenariats</div></div></div>
+        <div className="box-header"><div className="box-panda" style={{fontSize:32}}>⭐</div><div><div className="box-title">Bonus</div><div className="box-subtitle">Ressources, contact & partenariats</div></div></div>
         <div className="bonus-links">
-          <button className="bonus-link-btn">📩 Nous contacter</button>
-          <button className="bonus-link-btn">🛒 Commander les cartes VITA®</button>
-          <button className="bonus-link-btn">🤝 Partenariats</button>
-          <button className="bonus-link-btn">📰 Actualités Centre VITA</button>
+          <button className="bonus-link-btn"><span className="bonus-icon">📩</span> Nous contacter</button>
+          <button className="bonus-link-btn"><span className="bonus-icon">🛒</span> Commander les cartes VITA®</button>
+          <button className="bonus-link-btn"><span className="bonus-icon">🤝</span> Partenariats <span className="bonus-soon">(bientôt disponible)</span></button>
+          <button className="bonus-link-btn"><span className="bonus-icon">📰</span> Actualités Centre VITA</button>
         </div>
       </div>
 
-      {/* MENU */}
+      {/* RÉGLAGES */}
+      <h3 className="section-title-profil">⚙️ Réglages</h3>
       <div className="menu-box" style={{ animationDelay: "0.35s" }}>
         {[
           { i: "🔔", l: "Notifications & rappels" },
           { i: "🌍", l: "Langue", v: "Français · English (bientôt)" },
+          { i: "🕐", l: "Fuseau horaire", v: "UTC-4 (Martinique)" },
           { i: "📝", l: "Abonnement", v: "Early 2,99€/mois" },
           { i: "📋", l: "CGU / CGV" },
           { i: "🔒", l: "Confidentialité" },
@@ -688,7 +767,7 @@ export default function PandaZenApp() {
         /* ═══ CARDS GENERIC ═══ */
         .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-title-sm { font-weight: 700; font-size: 14px; color: #2d2f2e; margin-bottom: 10px; }
+        .card-title-sm { font-weight: 800; font-size: 15px; color: #1e270c; margin-bottom: 10px; }
         .link-btn { background: none; border: none; color: #5b7a5e; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
 
         /* ═══ MODULE PLACEHOLDER ═══ */
@@ -702,10 +781,12 @@ export default function PandaZenApp() {
         .water-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; animation: slideUp 0.4s ease both; }
         .water-panda { font-size: 48px; line-height: 1; }
         .water-main { background: rgba(255,255,255,0.93); border-radius: 24px; padding: 28px 20px; box-shadow: 0 4px 20px rgba(30,39,12,0.07); text-align: center; margin-bottom: 14px; }
+        .water-info-toggle { display: block; width: 100%; background: none; border: none; font-family: 'Nunito'; font-size: 13px; font-weight: 700; color: #3a7a94; cursor: pointer; text-align: left; padding: 6px 0; margin-bottom: 10px; }
+        .water-info-text { background: rgba(74,143,168,0.08); border-radius: 12px; padding: 14px; font-size: 13px; color: #2d3a2e; line-height: 1.6; font-weight: 600; margin-bottom: 14px; }
         .circle-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
         .circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .circle-bg { fill: none; stroke: rgba(107,163,190,0.12); stroke-width: 12; }
-        .circle-fill { fill: none; stroke: #6ba3be; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+        .circle-bg { fill: none; stroke: rgba(107,163,190,0.2); stroke-width: 12; }
+        .circle-fill { fill: none; stroke: #4a8fa8; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
         .circle-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
         .circle-num { font-weight: 800; font-size: 36px; color: #4a8fa8; }
         .circle-label { font-size: 13px; color: #6b7c6e; }
@@ -719,13 +800,34 @@ export default function PandaZenApp() {
         .goal-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid #9aaa9c; background: transparent; font-family: 'Nunito'; font-size: 14px; color: #2d2f2e; cursor: pointer; transition: all 0.15s; }
         .goal-btn.active { border: 2px solid #34490a; background: rgba(52,73,10,0.08); font-weight: 700; color: #34490a; }
         .goal-btn:hover { background: rgba(52,73,10,0.05); }
+        .water-goal-card { padding-bottom: 20px; }
+        .water-galet-rewards { margin-top: 16px; border-top: 1px solid rgba(154,170,156,0.15); padding-top: 14px; }
+        .water-reward-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; }
+        .water-reward-row.earned { background: rgba(91,122,94,0.08); }
+        .water-reward-label { font-weight: 700; font-size: 14px; color: #2d3a2e; }
+        .water-reward-val { display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 14px; color: #c9a96e; }
+        .water-check { color: #3a5a40; font-weight: 800; font-size: 16px; }
+        .water-module-cta { display: block; width: 100%; background: white; border: 2px solid #4a8fa8; border-radius: 16px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; color: #3a7a94; cursor: pointer; text-align: center; margin-bottom: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 10px rgba(74,143,168,0.1); animation: waterPulse 2.5s ease-in-out infinite; }
+        .water-module-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(74,143,168,0.2); animation: none; }
+        .water-module-cta:active { transform: scale(0.98); animation: none; }
+        @keyframes waterPulse { 0%,100% { box-shadow: 0 2px 10px rgba(74,143,168,0.1); } 50% { box-shadow: 0 2px 20px rgba(74,143,168,0.35); border-color: #3a7a94; } }
+        .water-reminder-desc { font-size: 13px; color: #2d3a2e; font-weight: 600; line-height: 1.5; margin-bottom: 12px; }
+        .water-reminder-config { background: rgba(74,143,168,0.06); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .reminder-row { display: flex; align-items: center; gap: 10px; justify-content: center; }
+        .reminder-label { font-weight: 700; font-size: 14px; color: #2d3a2e; }
+        .reminder-select { padding: 8px 12px; border: 1.5px solid #4a8fa8; border-radius: 10px; font-family: 'Nunito'; font-size: 14px; font-weight: 700; color: #3a7a94; background: white; cursor: pointer; }
+        .reminder-calc { text-align: center; margin-top: 8px; font-size: 13px; font-weight: 700; color: #4a8fa8; }
+        .water-reminder-btn { display: block; width: 100%; background: linear-gradient(135deg, #4a8fa8, #3a7a94); color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 3px 12px rgba(74,143,168,0.3); transition: transform 0.15s, box-shadow 0.15s; }
+        .water-reminder-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(74,143,168,0.4); }
+        .water-reminder-btn:active { transform: scale(0.98); }
+        .reminder-note { font-size: 11px; color: #6b7c6e; text-align: center; margin-top: 8px; font-style: italic; }
         .week-bars { display: flex; justify-content: space-between; margin-top: 14px; }
         .week-col { text-align: center; flex: 1; }
-        .bar-track { width: 28px; height: 56px; background: rgba(107,163,190,0.08); border-radius: 14px; margin: 0 auto 6px; position: relative; overflow: hidden; }
-        .bar-fill { position: absolute; bottom: 0; width: 100%; background: rgba(107,163,190,0.5); border-radius: 14px; transition: height 0.4s ease; }
-        .bar-fill.today { background: #6ba3be; }
-        .bar-label { font-size: 11px; color: #6b7c6e; }
-        .bar-label.today { color: #4a8fa8; font-weight: 700; }
+        .bar-track { width: 28px; height: 56px; background: rgba(107,163,190,0.15); border-radius: 14px; margin: 0 auto 6px; position: relative; overflow: hidden; }
+        .bar-fill { position: absolute; bottom: 0; width: 100%; background: rgba(74,143,168,0.6); border-radius: 14px; transition: height 0.4s ease; }
+        .bar-fill.today { background: #3a7a94; }
+        .bar-label { font-size: 12px; color: #3a5a40; font-weight: 600; }
+        .bar-label.today { color: #3a7a94; font-weight: 800; }
 
         /* ═══ PROFIL v5 ═══ */
         .profil-screen { padding-top: 10px; }
