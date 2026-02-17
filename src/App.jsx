@@ -1260,10 +1260,10 @@ export default function PandaZenApp() {
   const screens = [
     <HomeScreen galets={galets} streak={streak} onNav={goTab} />,
     <BreathScreen galets={galets} setGalets={setGalets} onNav={goTab} />,
-    <CardScreen />
-    <RelaxScreen />
+    <CardScreen />,
+    <RelaxScreen />,
     <WaterScreen galets={galets} setGalets={setGalets} />,
-    <RelationsPlaceholder />
+    <RelationsPlaceholder />,
     <ProfileScreen galets={galets} streak={streak} />
   ];
 
