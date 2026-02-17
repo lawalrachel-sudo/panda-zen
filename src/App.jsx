@@ -1435,8 +1435,8 @@ export default function PandaZenApp() {
         .breath-ex-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .breath-ex-name { font-size: 16px; font-weight: 600; color: #2d2d2d; }
         .breath-ex-done { background: #3a5a40; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-        .breath-ex-subtitle { font-size: 13px; color: #6b7c6e; margin-bottom: 6px; line-height: 1.3; }
-        .breath-ex-duration { font-size: 12px; color: #9aaa9c; margin-bottom: 8px; }
+        .breath-timer-time { font-size: 24px; font-weight: 600; color: #9aaa9c; font-family: 'Nunito', sans-serif; margin-top: 8px; }
+        .breath-timer-phase { font-size: 32px; color: #3a5a40; margin-bottom: 0; font-weight: 700; font-family: 'Josefin Sans', sans-serif; }
         .breath-ex-cta { font-size: 13px; color: #3a5a40; font-weight: 600; }
         .breath-ex-header { text-align: center; margin-bottom: 16px; }
         .breath-progress-bar { background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
