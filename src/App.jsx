@@ -1248,12 +1248,12 @@ export default function PandaZenApp() {
     { id: "profile", label: "_hidden_", icon: null },
   ];
 
- <BreathScreen galets={galets} setGalets={setGalets} onNav={goTab} />,
+ <BreathScreen galets={galets} setGalets={setGalets} onNav={goTab} />
     <CardScreen />,
     <RelaxScreen />,
     <WaterScreen galets={galets} setGalets={setGalets} />,
-    <RelationsPlaceholder />,
-    <ProfileScreen galets={galets} streak={streak} />,
+    <RelationsPlaceholder />
+    <ProfileScreen galets={galets} streak={streak} />
   ];
 
   return (
