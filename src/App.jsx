@@ -26,6 +26,19 @@ const P = {
   mudra:     pi('galets_zen_.png', 'Mudrâ'),
   bambou:    pi('HOME_bambou.png', 'Accueil'),
   pandaGalet: pi('panda_et_galet_gagne_.png', 'Galet gagné'),
+    // BADGES PROFILS BREATHING
+  badgeFeu: pi('BADGE_FEU.png', 'Feu'),
+  badgeFeuEq: pi('Badge_FEU__equilibre_.png', 'Feu Équilibre'),
+  badgeEau: pi('BAdge_eau.png', 'Eau'),
+  badgeBois: pi('Mange.png', 'Bois'),
+  badgeTerre: pi('Badge_TERRE.png', 'Terre'),
+  badgeMetal: pi('Badge_METAL.png', 'Métal'),
+  // ÉLÉMENTS DÉTOURÉS
+  elemFeu: pi('e_le_ment_feu.png', 'Élément Feu'),
+  elemEau: pi('e_le_ment_eau.png', 'Élément Eau'),
+  elemBois: pi('e_le_ment_bois.png', 'Élément Bois'),
+  elemTerre: pi('e_le_ment_terre.png', 'Élément Terre'),
+  elemMetal: pi('e_le_ment_me_tal.png', 'Élément Métal'),
 };
 
 // ═══ DONNÉES PROFIL (démo) ═══
@@ -67,7 +80,371 @@ const MUDRAS_PALIERS = [
   { day: 70, num: 17 },
   { day: 73, num: 18, final: true },
 ];
-
+// ═══════════════════════════════════════
+// DONNÉES BREATHING — 18 EXERCICES
+// ═══════════════════════════════════════
+const BREATHING_DATA = {
+  A: {
+    id: "A",
+    emoji: "🌊",
+    label: "CALMER",
+    element: "FEU 🔥",
+    besoin: "Lâcher, ralentir",
+    badge: P.badgeFeu,
+    elemIcon: P.elemFeu,
+    color: "#d35400",
+    exercises: [
+      {
+        id: "M1a",
+        name: "Soupir Cyclique",
+        subtitle: "Double inspir + longue expir",
+        principe: "Double inspiration courte + 1 longue expiration",
+        duration: "1-5 min",
+        steps: [
+          { phase: "Inspir nez", time: 1, desc: "Court, remplir moitié poumons" },
+          { phase: "Inspir nez", time: 2, desc: "Compléter, poumons pleins" },
+          { phase: "Expir bouche", time: 6, desc: "Lent, joues légèrement gonflées" }
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou debout, yeux ouverts ou fermés",
+        source: "Balban et al. (2023), Cell Reports Medicine, Stanford University — Le soupir cyclique surpasse la méditation pour l'amélioration de l'humeur (p<0.05)."
+      },
+      {
+        id: "M1b",
+        name: "Respiration 4-7-8",
+        subtitle: "Inspir court, rétention longue, expir très longue",
+        principe: "Inspir court, rétention longue, expir très longue",
+        duration: "1-3 min",
+        steps: [
+          { phase: "Inspir nez", time: 4, desc: "Remplir les poumons" },
+          { phase: "Rétention", time: 7, desc: "Poumons pleins, retenir" },
+          { phase: "Expir bouche", time: 8, desc: "Son 'whoosh' léger" }
+        ],
+        reps: "4 cycles pour débuter, jusqu'à 8 cycles avec pratique",
+        position: "Assis, bout de la langue derrière incisives supérieures",
+        source: "Dr Andrew Weil, MD (University of Arizona) — Recommandée NHS UK pour anxiété et aide à l'endormissement."
+      },
+      {
+        id: "M1c",
+        name: "Expiration Prolongée",
+        subtitle: "Expir = double de l'inspir",
+        principe: "Expiration = double de l'inspiration",
+        duration: "2-5 min",
+        steps: [
+          { phase: "Inspir nez", time: 4, desc: "Remplir naturellement" },
+          { phase: "Expir nez/bouche", time: 8, desc: "Doucement, laisser aller" }
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis, allongé ou debout",
+        source: "Principe fondamental cohérence cardiaque (HeartMath Institute) — Active le nerf vague et le système parasympathique."
+      }
+    ]
+  },
+  B: {
+    id: "B",
+    emoji: "⚖️",
+    label: "ÉQUILIBRER",
+    element: "FEU 🔥",
+    besoin: "Structure, cadre",
+    badge: P.badgeFeuEq,
+    elemIcon: P.elemFeu,
+    color: "#d35400",
+    exercises: [
+      {
+        id: "M2a",
+        name: "Box Breathing",
+        subtitle: "Respiration Carrée — 4 temps égaux",
+        principe: "4 temps strictement égaux (carré parfait)",
+        duration: "2-5 min",
+        steps: [
+          { phase: "Inspir nez", time: 4, desc: "Remplir les poumons" },
+          { phase: "Rétention", time: 4, desc: "Poumons pleins" },
+          { phase: "Expir nez", time: 4, desc: "Vider les poumons" },
+          { phase: "Rétention", time: 4, desc: "Poumons vides" }
+        ],
+        reps: "5 à 10 cycles (1 cycle = 16s)",
+        position: "Assis, dos droit, mains sur cuisses",
+        source: "Utilisé par US Navy SEALs (Mark Divine) — Effet stabilisant des ratios égaux confirmé (HeartMath)."
+      },
+      {
+        id: "M2b",
+        name: "Cohérence Cardiaque 5-5",
+        subtitle: "Ratio 1:1 strict, 6 respirations/min",
+        principe: "Ratio 1:1 strict, 6 respirations par minute",
+        duration: "5 min",
+        steps: [
+          { phase: "Inspir nez", time: 5, desc: "Régulier et fluide" },
+          { phase: "Expir nez/bouche", time: 5, desc: "Régulier et fluide" }
+        ],
+        reps: "30 cycles = 5 min (idéalement 3×/jour)",
+        position: "Assis, relaxé",
+        source: "Dr David O'Hare 'Cohérence Cardiaque 365' (2012), HeartMath Institute — Baisse cortisol, effet anxiolytique."
+      },
+      {
+        id: "M2c",
+        name: "Respiration Comptée Progressive",
+        subtitle: "Comptage croissant = ancrage attention",
+        principe: "Comptage mental croissant = ancrage attention",
+        duration: "2-5 min",
+        steps: [
+          { phase: "Cycle 1", time: 2, desc: "Inspir 2s → Expir 2s" },
+          { phase: "Cycle 2", time: 3, desc: "Inspir 3s → Expir 3s" },
+          { phase: "Cycle 3", time: 4, desc: "Inspir 4s → Expir 4s" },
+          { phase: "Cycle 4", time: 5, desc: "Inspir 5s → Expir 5s" },
+          { phase: "Cycle 5", time: 6, desc: "Inspir 6s → Expir 6s" },
+          { phase: "Redescendre", time: 0, desc: "5s… 4s… 3s… 2s" }
+        ],
+        reps: "1 montée + 1 descente = 1 série. 2-3 séries",
+        position: "Assis ou allongé",
+        source: "Tradition méditative (Vipassana, Zen) — Adapté aux profils ayant besoin de cadre."
+      }
+    ]
+  },
+  E: {
+    id: "E",
+    emoji: "⚡",
+    label: "ÉNERGISER",
+    element: "EAU 💧",
+    besoin: "Faire circuler",
+    badge: P.badgeEau,
+    elemIcon: P.elemEau,
+    color: "#3498db",
+    exercises: [
+      {
+        id: "M3a",
+        name: "Bhastrika",
+        subtitle: "Soufflet du forgeron",
+        principe: "Inspirations et expirations rapides et puissantes",
+        duration: "1-3 min",
+        steps: [
+          { phase: "Phase 1", time: 25, desc: "25 inspir/expir rapides nez (≈1/sec)" },
+          { phase: "Inspir profonde", time: 3, desc: "1 inspir profonde nez" },
+          { phase: "Rétention", time: 20, desc: "Retenir 15-30s selon niveau" },
+          { phase: "Expir lente", time: 5, desc: "1 expir lente nez" },
+          { phase: "Repos", time: 30, desc: "30s repos → répéter" }
+        ],
+        reps: "3 rounds",
+        position: "Assis dos droit, mains sur genoux",
+        precaution: "⚠️ Ne pas pratiquer si grossesse, hypertension, épilepsie.",
+        source: "Hatha Yoga Pradipika — Études PMC confirment activation sympathique et libération d'adrénaline."
+      },
+      {
+        id: "M3b",
+        name: "Kapalabhati",
+        subtitle: "Crâne Brillant — Expir actives",
+        principe: "Expirations saccadées actives, inspirations passives",
+        duration: "1-3 min",
+        steps: [
+          { phase: "Expir nez", time: 0.5, desc: "Rapide, sec, abdomen rentre" },
+          { phase: "Inspir nez", time: 0.5, desc: "Passive, automatique" },
+          { phase: "Série", time: 0, desc: "30 expir → pause → inspir profonde → rétention 15s" }
+        ],
+        reps: "3 rounds de 30",
+        position: "Assis dos droit",
+        precaution: "⚠️ Mêmes précautions que Bhastrika. Plus doux.",
+        source: "Hatha Yoga Pradipika — Amélioration capacité pulmonaire et éveil mental (PMC)."
+      },
+      {
+        id: "M3c",
+        name: "Respiration Dynamisante",
+        subtitle: "Souffle + mouvement",
+        principe: "Synchroniser souffle et geste pour activer circulation",
+        duration: "1-2 min",
+        steps: [
+          { phase: "Inspir nez (2s)", time: 2, desc: "Debout, bras montent au-dessus tête" },
+          { phase: "Expir bouche (2s)", time: 2, desc: "Bras redescendent" },
+          { phase: "Accélérer", time: 0, desc: "Inspir 1s / Expir 1s, 10-20 fois" },
+          { phase: "Terminer", time: 0, desc: "Inspir profonde → rétention 5s → expir lente" }
+        ],
+        reps: "1-2 séries",
+        position: "Debout obligatoirement",
+        source: "Qi gong et yoga dynamique — Mouvement + souffle = activation circulatoire."
+      }
+    ]
+  },
+  F: {
+    id: "F",
+    emoji: "🔄",
+    label: "PURIFIER / RÉVÉLER",
+    element: "BOIS 🌳",
+    besoin: "Libérer, révéler",
+    badge: P.badgeBois,
+    elemIcon: P.elemBois,
+    color: "#27ae60",
+    exercises: [
+      {
+        id: "M4a",
+        name: "Nadi Shodhana",
+        subtitle: "Narines Alternées",
+        principe: "Alternance narine gauche ↔ droite = équilibre hémisphères",
+        duration: "3-5 min",
+        steps: [
+          { phase: "Fermer D", time: 4, desc: "Inspir narine G 4s" },
+          { phase: "Fermer G", time: 2, desc: "Rétention 2s" },
+          { phase: "Ouvrir D", time: 6, desc: "Expir narine D 6s" },
+          { phase: "Inspir D", time: 4, desc: "Inspir narine D 4s" },
+          { phase: "Fermer D", time: 2, desc: "Rétention 2s" },
+          { phase: "Ouvrir G", time: 6, desc: "Expir narine G 6s" }
+        ],
+        reps: "5 à 10 cycles complets (G→D→G)",
+        position: "Assis dos droit",
+        source: "Pranayama classique (Yoga Sutras) — Équilibrage système nerveux confirmé (PMC)."
+      },
+      {
+        id: "M4b",
+        name: "Respiration 3 Parties",
+        subtitle: "Dirga Pranayama",
+        principe: "Remplissage complet progressif",
+        duration: "3-5 min",
+        steps: [
+          { phase: "Partie 1", time: 3, desc: "Inspir → ventre gonfle (3s)" },
+          { phase: "Partie 2", time: 2, desc: "Continuer → cage thoracique (2s)" },
+          { phase: "Partie 3", time: 1, desc: "Terminer → haut poitrine (1s)" },
+          { phase: "Expir", time: 8, desc: "Expir lente inverse : haut → milieu → bas (8s)" }
+        ],
+        reps: "5 à 8 cycles",
+        position: "Assis ou allongé",
+        source: "Yoga classique (Dirga = 'long/complet') — Technique fondamentale."
+      },
+      {
+        id: "M4c",
+        name: "Sithali",
+        subtitle: "Souffle Rafraîchissant",
+        principe: "Inspir bouche (langue enroulée), expir nez",
+        duration: "2-3 min",
+        steps: [
+          { phase: "Inspir bouche", time: 4, desc: "Langue en U, sensation fraîche (4s)" },
+          { phase: "Fermer bouche", time: 0, desc: "Fermer la bouche" },
+          { phase: "Expir nez", time: 6, desc: "Expir nez 6s" }
+        ],
+        reps: "5 à 10 cycles",
+        position: "Assis",
+        precaution: "⚠️ ~35% ne peuvent enrouler la langue. Alternative : Sitkari (dents serrées).",
+        source: "Hatha Yoga Pradipika — Effet rafraîchissant documenté."
+      }
+    ]
+  },
+  C: {
+    id: "C",
+    emoji: "🌍",
+    label: "ANCRER / PROFONDEUR",
+    element: "TERRE 🌍",
+    besoin: "Profondeur",
+    badge: P.badgeTerre,
+    elemIcon: P.elemTerre,
+    color: "#8b7355",
+    exercises: [
+      {
+        id: "M5a",
+        name: "Respiration Abdominale",
+        subtitle: "Diaphragmatique",
+        principe: "Respirer exclusivement par le ventre",
+        duration: "3-5 min",
+        steps: [
+          { phase: "Inspir nez", time: 5, desc: "Ventre gonfle, poitrine immobile (5s)" },
+          { phase: "Expir nez", time: 6, desc: "Ventre rentre doucement (6s)" }
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou allongé (allongé = plus facile)",
+        source: "American Lung Association — Optimise oxygénation. NHS UK recommandée pour anxiété."
+      },
+      {
+        id: "M5b",
+        name: "Respiration en Vague",
+        subtitle: "Body Scan Breath",
+        principe: "Visualisation vague traversant le corps",
+        duration: "3-5 min",
+        steps: [
+          { phase: "Inspir nez (5s)", time: 5, desc: "Vague monte : pieds → tête" },
+          { phase: "Temps plein (2s)", time: 2, desc: "Vague au sommet" },
+          { phase: "Expir nez (5s)", time: 5, desc: "Vague redescend : tête → pieds" },
+          { phase: "Temps vide (2s)", time: 2, desc: "Vague se retire" }
+        ],
+        reps: "5 à 8 cycles",
+        position: "Allongé de préférence",
+        source: "Sophrologie (Alfonso Caycedo) + MBSR (Jon Kabat-Zinn) — Souffle + visualisation."
+      },
+      {
+        id: "M5c",
+        name: "Respiration Enracinement",
+        subtitle: "Grounding Breath",
+        principe: "Visualisation racines + connexion terre",
+        duration: "2-3 min",
+        steps: [
+          { phase: "Inspir nez (4s)", time: 4, desc: "Énergie monte : pieds → colonne" },
+          { phase: "Rétention (2s)", time: 2, desc: "Énergie au centre" },
+          { phase: "Expir nez (6s)", time: 6, desc: "Racines descendent dans le sol" },
+          { phase: "Rétention vide (2s)", time: 2, desc: "Sentir la stabilité" }
+        ],
+        reps: "5 à 8 cycles",
+        position: "Assis pieds au sol",
+        source: "Qi gong (Zhan Zhuang) — Grounding/earthing (Oschman et al., 2015)."
+      }
+    ]
+  },
+  D: {
+    id: "D",
+    emoji: "🔔",
+    label: "EXPRIMER",
+    element: "MÉTAL 🔩",
+    besoin: "Exprimer",
+    badge: P.badgeMetal,
+    elemIcon: P.elemMetal,
+    color: "#95a5a6",
+    exercises: [
+      {
+        id: "M6a",
+        name: "Bhramari",
+        subtitle: "Abeille Bourdonnante",
+        principe: "Hmmm grave — vibration crâne et corps",
+        duration: "2-5 min",
+        steps: [
+          { phase: "Inspir nez", time: 5, desc: "Inspir profonde 5s" },
+          { phase: "Expir 'HMMM'", time: 8, desc: "Bouche fermée, grave et continu (8s)" },
+          { phase: "Vibration", time: 0, desc: "Sentir : lèvres → nez → crâne" },
+          { phase: "Silence (3s)", time: 3, desc: "Écouter résonance" }
+        ],
+        reps: "3 à 7 cycles (commencer 3, +1/semaine)",
+        position: "Assis dos droit",
+        precaution: "⚠️ Ne pas appuyer fort sur oreilles. Estomac vide.",
+        source: "Hatha Yoga Pradipika — Revue PMC 2024 (46 études) : effets confirmés anxiété, variabilité cardiaque."
+      },
+      {
+        id: "M6b",
+        name: "Ujjayi",
+        subtitle: "Souffle de l'Océan",
+        principe: "Gorge légèrement contractée = son vague",
+        duration: "3-5 min",
+        steps: [
+          { phase: "Inspir nez (5s)", time: 5, desc: "Gorge contractée, son 'hhhhh'" },
+          { phase: "Expir nez (6s)", time: 6, desc: "Son vague 'haaaah' doux" }
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou pendant activité douce",
+        precaution: "⚠️ Son audible par soi, pas par quelqu'un à 2m.",
+        source: "Ashtanga Yoga (K. Pattabhi Jois) — Régulation température + activation parasympathique."
+      },
+      {
+        id: "M6c",
+        name: "Om / Souffle Chanté",
+        subtitle: "Vocal Breath",
+        principe: "Vibration voyelle traversant le corps",
+        duration: "2-3 min",
+        steps: [
+          { phase: "Inspir nez (5s)", time: 5, desc: "Inspir profonde" },
+          { phase: "'OOOO' (2s)", time: 2, desc: "Expir bouche, vibration ventre" },
+          { phase: "'UUUU' (2s)", time: 2, desc: "Vibration poitrine/cœur" },
+          { phase: "'MMMM' (4s)", time: 4, desc: "Vibration crâne (bouche ferme)" },
+          { phase: "Silence (3s)", time: 3, desc: "Écouter résonance" }
+        ],
+        reps: "5 à 10 cycles",
+        position: "Assis dos droit",
+        precaution: "⚠️ Variante simple : 'AAAAAHHHH' long = libérer sans structure.",
+        source: "Tradition védique (5000+ ans) — Om chanting améliore fonction pulmonaire (2014, IJOY)."
+      }
+    ]
+  }
+};
 // ═══════════════════════════════════════
 // ÉCRAN ACCUEIL v2
 // ═══════════════════════════════════════
@@ -118,17 +495,271 @@ const HomeScreen = ({ galets, streak, onNav }) => {
 // ═══════════════════════════════════════
 // ÉCRAN RESPIRER
 // ═══════════════════════════════════════
-const BreathScreen = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.breathe}</div>
-      <h2 className="title-lg">Respiration</h2>
-      <p className="module-desc">Des exercices adaptés selon ton profil — 18 techniques de cohérence cardiaque.</p>
-      <div className="phase-badge">⏳ Module breathing-v8 à intégrer</div>
-    </div>
-  </div>
-);
+const BreathScreen = ({ galets, setGalets, onNav }) => {
+  const [view, setView] = useState("categories");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [completedExercises, setCompletedExercises] = useState({});
+  const [showGuidePopup, setShowGuidePopup] = useState(false);
+  const [showChoiceButtons, setShowChoiceButtons] = useState(false);
 
+  // Scroll to top à chaque changement de view
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+
+  useEffect(() => {
+    if (!isTimerRunning || timeLeft === 0) return;
+    const timer = setTimeout(() => setTimeLeft(t => t - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [isTimerRunning, timeLeft]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && isTimerRunning && selectedExercise) {
+      const nextIndex = currentStepIndex + 1;
+      if (nextIndex < selectedExercise.steps.length) {
+        setCurrentStepIndex(nextIndex);
+        setTimeLeft(selectedExercise.steps[nextIndex].time);
+      } else {
+        setIsTimerRunning(false);
+        if (!completedExercises[selectedExercise.id]) {
+          setGalets(g => g + 2);
+          setCompletedExercises(prev => ({ ...prev, [selectedExercise.id]: true }));
+        }
+      }
+    }
+  }, [timeLeft, isTimerRunning, currentStepIndex, selectedExercise, completedExercises, setGalets]);
+
+  const startExercise = (ex) => {
+    setSelectedExercise(ex);
+    setCurrentStepIndex(0);
+    setTimeLeft(ex.steps[0].time);
+    setIsTimerRunning(false);
+    setView("exercise");
+  };
+
+  const toggleTimer = () => setIsTimerRunning(!isTimerRunning);
+  
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setCurrentStepIndex(0);
+    setTimeLeft(selectedExercise.steps[0].time);
+  };
+
+  const handleCategoryClick = (cat) => {
+    setSelectedCategory(cat);
+    setShowChoiceButtons(false);
+    setView("list");
+  };
+
+  const handleGuideClick = () => {
+    // TODO CONNEXION MODULES : Quand Miroir/Cartes/Relations seront prêts
+    setShowGuidePopup(true);
+  };
+
+  const handleChooseClick = () => {
+    setShowChoiceButtons(true);
+  };
+
+  // ÉCRAN 1 : CATÉGORIES
+  if (view === "categories") {
+    return (
+      <div className="screen">
+        <div className="breath-header">
+          <div className="breath-panda">{P.breathe}</div>
+          <h2 className="title-lg">Panda Respire</h2>
+          <p className="tagline-sm">18 exercices sourcés scientifiquement</p>
+        </div>
+        <p className="breath-intro fade-in">Choisis ton profil pour découvrir les exercices qui te correspondent.</p>
+        <div className="breath-categories fade-in" style={{ animationDelay: "0.05s" }}>
+          {Object.values(BREATHING_DATA).map((cat, i) => (
+            <button
+              key={cat.id}
+              className="breath-cat-card fade-in"
+              style={{ animationDelay: `${i * 0.05}s`, borderLeftColor: cat.color }}
+              onClick={() => handleCategoryClick(cat)}
+            >
+              <div className="breath-cat-badge">{cat.badge}</div>
+              <div className="breath-cat-content">
+                <div className="breath-cat-label">{cat.label}</div>
+                <div className="breath-cat-element">{cat.element}</div>
+                <div className="breath-cat-besoin">Ton profil demande de : {cat.besoin}</div>
+                <div className="breath-cat-count">{cat.exercises.length} exercices →</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ÉCRAN 2 : LISTE EXERCICES
+  if (view === "list" && selectedCategory) {
+    return (
+      <div className="screen">
+        <button className="breath-back" onClick={() => { setView("categories"); setShowChoiceButtons(false); }}>← Profils</button>
+        
+        <div className="breath-list-header">
+          <div className="breath-list-badge">{selectedCategory.badge}</div>
+          <h2 className="title-lg">{selectedCategory.label}</h2>
+          <p className="breath-list-element">{selectedCategory.element}</p>
+          <p className="breath-list-besoin">Ton profil demande de : {selectedCategory.besoin}</p>
+        </div>
+
+        <p className="breath-choice-intro">Choisis l'exercice qui te parle ou laisse Panda te guider</p>
+
+        <div className="breath-choice-buttons">
+          <button className="breath-choice-btn" onClick={handleChooseClick}>
+            <span className="breath-choice-emoji">👆</span>
+            <span className="breath-choice-label">Je choisis</span>
+          </button>
+          <button className="breath-choice-btn" onClick={handleGuideClick}>
+            <span className="breath-choice-emoji">🐼</span>
+            <span className="breath-choice-label">Panda me guide</span>
+          </button>
+        </div>
+
+        {showChoiceButtons && (
+          <div className="breath-exercises-list fade-in">
+            {selectedCategory.exercises.map((ex, i) => (
+              <button
+                key={ex.id}
+                className="breath-ex-card"
+                style={{ animationDelay: `${i * 0.05}s` }}
+                onClick={() => startExercise(ex)}
+              >
+                <div className="breath-ex-top">
+                  <div className="breath-ex-name">{ex.name}</div>
+                  {completedExercises[ex.id] && <span className="breath-ex-done">✓</span>}
+                </div>
+                <div className="breath-ex-subtitle">{ex.subtitle}</div>
+                <div className="breath-ex-duration">⏱️ {ex.duration}</div>
+                <div className="breath-ex-cta">Commencer →</div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {showGuidePopup && (
+          <div className="popup-overlay" onClick={() => setShowGuidePopup(false)}>
+            <div className="popup-card" onClick={e => e.stopPropagation()}>
+              <div className="popup-panda">{P.meditate}</div>
+              <h3 className="popup-title">Panda te guidera bientôt !</h3>
+              <p className="popup-text">Pour que Panda te guide, fais d'abord ton Miroir du jour.</p>
+              <p className="popup-text-small">En attendant, choisis l'exercice qui te parle !</p>
+              <div className="popup-buttons">
+                <button className="popup-btn secondary" onClick={() => setShowGuidePopup(false)}>
+                  Choisir moi-même
+                </button>
+                <button className="popup-btn primary" onClick={() => { setShowGuidePopup(false); onNav(6); }}>
+                  Aller au Miroir
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ÉCRAN 3 : EXERCICE + TIMER
+  if (view === "exercise" && selectedExercise) {
+    const currentStep = selectedExercise.steps[currentStepIndex];
+    const progress = ((currentStepIndex + 1) / selectedExercise.steps.length) * 100;
+    const isCompleted = !isTimerRunning && currentStepIndex === selectedExercise.steps.length - 1 && timeLeft === 0;
+
+    return (
+      <div className="screen">
+        <button className="breath-back" onClick={() => setView("list")}>← Exercices</button>
+        
+        <div className="breath-ex-header">
+          <h2 className="title-lg">{selectedExercise.name}</h2>
+          <p className="breath-ex-subtitle">{selectedExercise.subtitle}</p>
+        </div>
+
+        <div className="breath-progress-bar">
+          <div className="breath-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+        <p className="breath-progress-label">Étape {currentStepIndex + 1} / {selectedExercise.steps.length}</p>
+
+        <div className="breath-timer-zone">
+          {!isCompleted ? (
+            <>
+              <div className="breath-timer-circle">
+                <div className="breath-timer-time">{timeLeft}s</div>
+                <div className="breath-timer-phase">{currentStep.phase}</div>
+              </div>
+              <p className="breath-timer-desc">{currentStep.desc}</p>
+              <div className="breath-timer-btns">
+                <button className="breath-timer-btn primary" onClick={toggleTimer}>
+                  {isTimerRunning ? "⏸ Pause" : "▶ Démarrer"}
+                </button>
+                <button className="breath-timer-btn secondary" onClick={resetTimer}>↻ Recommencer</button>
+              </div>
+            </>
+          ) : (
+            <div className="breath-complete fade-in">
+              <div className="breath-complete-panda">{P.thumbsUp}</div>
+              <h3 className="breath-complete-title">Exercice terminé !</h3>
+              {!completedExercises[selectedExercise.id] && (
+                <div className="breath-complete-galets">
+                  <span className="galet-inline">{P.galets}</span> +2 galets
+                </div>
+              )}
+              <button className="breath-complete-btn" onClick={() => setView("list")}>
+                Retour aux exercices
+              </button>
+              <button className="breath-restart-btn" onClick={resetTimer}>
+                ↻ Refaire cet exercice
+              </button>
+            </div>
+          )}
+        </div>
+
+        {!isCompleted && (
+          <div className="breath-details">
+            <div className="breath-detail-item">
+              <strong>Principe :</strong> {selectedExercise.principe}
+            </div>
+            <div className="breath-detail-item">
+              <strong>Répétitions :</strong> {selectedExercise.reps}
+            </div>
+            <div className="breath-detail-item">
+              <strong>Position :</strong> {selectedExercise.position}
+            </div>
+            {selectedExercise.precaution && (
+              <div className="breath-detail-item precaution">
+                {selectedExercise.precaution}
+              </div>
+            )}
+            
+            <div className="breath-audio-section">
+              <div className="breath-audio-header">
+                <span className="breath-audio-icon">🎵</span>
+                <span className="breath-audio-label">Musique de relaxation</span>
+                <button className="breath-audio-toggle" disabled>
+                  🔇
+                </button>
+              </div>
+              <p className="breath-audio-text">Écouter de la musique douce permet une détente encore plus profonde.</p>
+              <p className="breath-audio-soon">(bientôt disponible)</p>
+            </div>
+
+            <details className="breath-source">
+              <summary>📚 Source scientifique</summary>
+              <p>{selectedExercise.source}</p>
+            </details>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+};
 // ═══════════════════════════════════════
 // ÉCRAN CARTE VITA
 // ═══════════════════════════════════════
@@ -617,9 +1248,7 @@ export default function PandaZenApp() {
     { id: "profile", label: "_hidden_", icon: null },
   ];
 
-  const screens = [
-    <HomeScreen galets={galets} streak={streak} onNav={goTab} />,
-    <BreathScreen />,
+ <BreathScreen galets={galets} setGalets={setGalets} onNav={goTab} />,
     <CardScreen />,
     <RelaxScreen />,
     <WaterScreen galets={galets} setGalets={setGalets} />,
@@ -764,6 +1393,89 @@ export default function PandaZenApp() {
         .home-action-desc { font-size: 13px; color: #2d3a2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
         .home-galet-badge { background: #f5f0eb; border: 1.5px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
+/* ═══ BREATHING MODULE ═══ */
+        .breath-header { text-align: center; margin-bottom: 20px; }
+        .breath-panda { width: 80px; height: 80px; margin: 0 auto 12px; }
+        .breath-intro { font-size: 14px; color: #6b7c6e; margin-bottom: 20px; line-height: 1.5; text-align: center; }
+        .breath-categories { display: flex; flex-direction: column; gap: 12px; }
+        .breath-cat-card { background: white; border: none; border-left: 4px solid #3a5a40; border-radius: 12px; padding: 14px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.2s; }
+        .breath-cat-card:active { transform: scale(0.98); }
+        .breath-cat-badge { width: 56px; height: 56px; flex-shrink: 0; }
+        .breath-cat-content { flex: 1; }
+        .breath-cat-label { font-size: 17px; font-weight: 700; color: #2d2f2e; margin-bottom: 2px; }
+        .breath-cat-element { font-size: 13px; color: #6b7c6e; margin-bottom: 2px; }
+        .breath-cat-besoin { font-size: 12px; color: #9aaa9c; font-style: italic; margin-bottom: 6px; }
+        .breath-cat-count { font-size: 13px; color: #3a5a40; font-weight: 600; }
+        .breath-back { background: #f5f0eb; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; color: #3a5a40; cursor: pointer; margin-bottom: 20px; font-weight: 500; }
+        .breath-back:active { background: #e8dfd6; }
+        .breath-list-header { text-align: center; margin-bottom: 20px; }
+        .breath-list-badge { width: 80px; height: 80px; margin: 0 auto 12px; }
+        .breath-list-element { font-size: 14px; color: #6b7c6e; margin: 8px 0 4px; }
+        .breath-list-besoin { font-size: 13px; color: #9aaa9c; font-style: italic; }
+        .breath-choice-intro { font-size: 14px; color: #6b7c6e; text-align: center; margin-bottom: 16px; line-height: 1.5; }
+        .breath-choice-buttons { display: flex; gap: 12px; margin-bottom: 24px; }
+        .breath-choice-btn { flex: 1; background: white; border: 2px solid #3a5a40; border-radius: 12px; padding: 16px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s; }
+        .breath-choice-btn:active { transform: scale(0.95); background: #f5f0eb; }
+        .breath-choice-emoji { font-size: 28px; }
+        .breath-choice-label { font-size: 14px; font-weight: 600; color: #3a5a40; }
+        .breath-exercises-list { display: flex; flex-direction: column; gap: 12px; }
+        .breath-ex-card { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 14px; text-align: left; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: all 0.2s; }
+        .breath-ex-card:active { transform: scale(0.98); }
+        .breath-ex-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .breath-ex-name { font-size: 16px; font-weight: 600; color: #2d2d2d; }
+        .breath-ex-done { background: #3a5a40; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .breath-ex-subtitle { font-size: 13px; color: #6b7c6e; margin-bottom: 6px; line-height: 1.3; }
+        .breath-ex-duration { font-size: 12px; color: #9aaa9c; margin-bottom: 8px; }
+        .breath-ex-cta { font-size: 13px; color: #3a5a40; font-weight: 600; }
+        .breath-ex-header { text-align: center; margin-bottom: 16px; }
+        .breath-progress-bar { background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+        .breath-progress-fill { background: linear-gradient(90deg, #3a5a40, #5b7a5e); height: 100%; transition: width 0.3s; }
+        .breath-progress-label { font-size: 12px; color: #9aaa9c; text-align: center; margin-bottom: 20px; }
+        .breath-timer-zone { text-align: center; margin-bottom: 20px; }
+        .breath-timer-circle { width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(135deg, #f5f0eb 0%, #e8dfd6 100%); margin: 0 auto 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .breath-timer-time { font-size: 44px; font-weight: 700; color: #3a5a40; font-family: 'Josefin Sans', sans-serif; }
+        .breath-timer-phase { font-size: 14px; color: #6b7c6e; margin-top: 6px; font-weight: 500; }
+        .breath-timer-desc { font-size: 14px; color: #6b7c6e; margin-bottom: 16px; line-height: 1.5; }
+        .breath-timer-btns { display: flex; gap: 12px; justify-content: center; }
+        .breath-timer-btn { border: none; border-radius: 12px; padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .breath-timer-btn.primary { background: #3a5a40; color: white; }
+        .breath-timer-btn.primary:active { background: #2d4632; transform: scale(0.98); }
+        .breath-timer-btn.secondary { background: #f5f0eb; color: #3a5a40; }
+        .breath-timer-btn.secondary:active { background: #e8dfd6; transform: scale(0.98); }
+        .breath-complete { text-align: center; padding: 30px 16px; }
+        .breath-complete-panda { width: 100px; height: 100px; margin: 0 auto 16px; }
+        .breath-complete-title { font-size: 22px; color: #3a5a40; margin-bottom: 12px; font-family: 'Josefin Sans', sans-serif; }
+        .breath-complete-galets { font-size: 17px; color: #c9a96e; margin-bottom: 20px; font-weight: 600; }
+        .breath-complete-btn { background: #3a5a40; color: white; border: none; border-radius: 12px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 12px; display: block; width: 100%; }
+        .breath-complete-btn:active { background: #2d4632; transform: scale(0.98); }
+        .breath-restart-btn { background: #f5f0eb; color: #3a5a40; border: none; border-radius: 12px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; display: block; width: 100%; }
+        .breath-restart-btn:active { background: #e8dfd6; transform: scale(0.98); }
+        .breath-details { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .breath-detail-item { font-size: 14px; color: #6b7c6e; margin-bottom: 12px; line-height: 1.5; }
+        .breath-detail-item strong { color: #2d2f2e; font-weight: 600; }
+        .breath-detail-item.precaution { background: #fff3cd; border-left: 3px solid #ff9800; padding: 10px; border-radius: 6px; color: #856404; }
+        .breath-audio-section { margin: 16px 0; padding: 14px; background: #f5f0eb; border-radius: 10px; }
+        .breath-audio-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .breath-audio-icon { font-size: 20px; }
+        .breath-audio-label { flex: 1; font-size: 14px; font-weight: 600; color: #2d2f2e; }
+        .breath-audio-toggle { background: #e0e0e0; border: none; padding: 6px 12px; border-radius: 16px; font-size: 16px; cursor: not-allowed; opacity: 0.5; }
+        .breath-audio-text { font-size: 13px; color: #6b7c6e; line-height: 1.5; margin-bottom: 4px; }
+        .breath-audio-soon { font-size: 12px; color: #9aaa9c; font-style: italic; }
+        .breath-source { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e0e0e0; }
+        .breath-source summary { font-size: 13px; color: #3a5a40; font-weight: 600; cursor: pointer; list-style: none; }
+        .breath-source summary::-webkit-details-marker { display: none; }
+        .breath-source p { font-size: 12px; color: #6b7c6e; margin-top: 8px; line-height: 1.5; }
+        .popup-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .popup-card { background: white; border-radius: 20px; padding: 28px; max-width: 340px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        .popup-panda { width: 80px; height: 80px; margin: 0 auto 16px; }
+        .popup-title { font-family: 'Josefin Sans', sans-serif; font-size: 20px; font-weight: 700; color: #2d2f2e; margin-bottom: 12px; }
+        .popup-text { font-size: 14px; color: #6b7c6e; line-height: 1.5; margin-bottom: 8px; }
+        .popup-text-small { font-size: 13px; color: #9aaa9c; margin-bottom: 20px; }
+        .popup-buttons { display: flex; gap: 10px; }
+        .popup-btn { flex: 1; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .popup-btn.primary { background: #3a5a40; color: white; }
+        .popup-btn.secondary { background: #f5f0eb; color: #3a5a40; }
+       
         /* ═══ CARDS GENERIC ═══ */
         .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; }
