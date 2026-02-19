@@ -1,27 +1,21 @@
 import React from 'react';
 
 // ═══════════════════════════════════════
-// MODULE BREATHING V13 - PANDA ZEN
-// Base : V8 + nouveautés V13 (18/02/2026)
-// Nouveautés :
-//   1. Badge panda 28px à droite du titre ex-card
-//   2. Nav 36px images GitHub (remplace emojis)
-//   3. Musique Cloudinary — icône 🔇/🎵 + toast unique
-//   4. Galets header live (🪨 + compteur)
-// À intégrer dans App.jsx — remplace BreathScreen placeholder
+// MODULE BREATHING V13 CORRIGÉ - PANDA ZEN
+// Corrections 19/02/2026 :
+//   1. Animaux validés (Bernard-l'ermite, Fourmi Manioc, Dauphin)
+//   2. Bouton musique → droite (right:16) — ne chevauche plus ← Retour
+//   3. Badge profil visible dans vue exercise (haut droit)
+//   4. Panda timer centré (display:block, margin:0 auto)
+//   5. Page blanche fix — return null sécurisé
 // ═══════════════════════════════════════
 
-// ─────────────────────────────────────────
-// CONSTANTES MUSIQUE (à placer en haut de App.jsx avec les autres consts)
-// ─────────────────────────────────────────
 const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/video/upload/';
 const MUSIC_LIBRARY = {
   zen:    ['zen_1.mp3','zen_2.mp3','zen_3.mp3','zen_4.mp3','zen_5.mp3'],
   bols:   ['bols_1.mp3','bols_2.mp3','bols_3.mp3'],
   nature: ['nature_1.mp3','nature_2.mp3','nature_3.mp3']
 };
-// Assignation salle → catégorie musique
-// 🌬️ Respiration = bols | 🎴 Carte = zen | 🐾 Relax = nature | 💧 Eau = nature | 🪞 Relations = zen
 const MUSIC_CONFIG = {
   breathe:   'bols',
   card:      'zen',
@@ -32,16 +26,17 @@ const MUSIC_CONFIG = {
 
 // ─────────────────────────────────────────
 // DONNÉES BREATHING — 18 EXERCICES (6 profils)
+// Animaux validés méthode VITA (test radiesthésique 04/02/2026)
 // ─────────────────────────────────────────
 const BREATHING_DATA = {
   A: {
     label: "CALMER",
-    profil: "Colibri · Feu",
+    profil: "Bernard-l'ermite · Feu",
     besoin: "Lâcher, ralentir",
     color: "#4a8fa8",
     badge: "Badge_FEU__equilibre_.png",
     img: "e_le_ment_feu.png",
-    animal: "Colibri",
+    animal: "Bernard-l'ermite",
     element: "Feu",
     phrase: "Laisser la pensée passer sans la retenir",
     guideTxt: "Tu rumines et ton mental tourne. Ces respirations sont faites pour lâcher, pas pour contrôler.",
@@ -163,12 +158,12 @@ const BREATHING_DATA = {
   },
   C: {
     label: "ANCRER / PROFONDEUR",
-    profil: "Tortue · Terre",
+    profil: "Fourmi Manioc · Terre",
     besoin: "Profondeur, stabilité",
     color: "#8b7355",
     badge: "Badge_TERRE.png",
     img: "e_le_ment_terre.png",
-    animal: "Tortue",
+    animal: "Fourmi Manioc",
     element: "Terre",
     phrase: "Trouver la profondeur et la stabilité en soi",
     guideTxt: "Tu cherches à contrôler. Ces respirations t'invitent à descendre en toi, pas à maîtriser.",
@@ -214,27 +209,27 @@ const BREATHING_DATA = {
         duration: "2–3 min",
         zenTxt: "Pieds nus sur le sol, tu envoies des racines à chaque expiration. Ce n'est pas une métaphore — c'est une sensation corporelle réelle.",
         pratique: [
-          "Assieds-toi, pieds nus au sol. Sense le contact des plantes de pieds avec le sol.",
+          "Assieds-toi, pieds nus au sol. Sens le contact des plantes de pieds avec le sol.",
           "Inspire en 4 temps — chaleur monte : plante pieds → jambes → bassin → colonne.",
           "Rétention 2s — énergie au centre du corps.",
-          "Expire en 6 temps — racines descendent de tes pieds dans le sol, de plus en plus profondes.",
+          "Expire en 6 temps — racines descendent de tes pieds dans le sol.",
           "Rétention vide 2s — sens la stabilité."
         ],
         reps: "5 à 8 cycles",
         position: "Assis pieds au sol (chaise ou sol)",
         astuces: "Si tu es debout, c'est encore mieux. Le contact avec le sol amplifie la sensation.",
-        source: "Qi gong (Zhan Zhuang — posture de l'arbre) — Oschman et al. (2015), Journal of Inflammation Research."
+        source: "Qi gong (Zhan Zhuang) — Oschman et al. (2015), Journal of Inflammation Research."
       }
     ]
   },
   D: {
     label: "EXPRIMER",
-    profil: "Giraumon · Métal",
+    profil: "Dauphin · Métal",
     besoin: "Exprimer, sortir le son",
     color: "#9e9e9e",
     badge: "Badge_METAL.png",
     img: "e_le_ment_me_tal.png",
-    animal: "Giraumon",
+    animal: "Dauphin",
     element: "Métal",
     phrase: "Laisser sortir ce qui retient en dedans",
     guideTxt: "Tu te retires souvent plutôt que d'exprimer. Ces respirations sonores t'invitent à laisser sortir — doucement.",
@@ -287,7 +282,7 @@ const BREATHING_DATA = {
         reps: "5 à 10 cycles",
         position: "Assis dos droit",
         astuces: "Variante simple si Om te bloque : juste 'AAAAAHHH' long sur toute l'expiration. Même effet libérateur.",
-        source: "Tradition védique (5000+ ans) — Mooventhan & Khode (2014, IJOY) : Om améliore la fonction pulmonaire."
+        source: "Tradition védique (5000+ ans) — Mooventhan & Khode (2014, IJOY)."
       }
     ]
   },
@@ -427,11 +422,7 @@ const BREATHING_DATA = {
 
 // ─────────────────────────────────────────
 // HOOK MUSIQUE — useMusic
-// (à placer dans App.jsx avant BreathScreen)
 // ─────────────────────────────────────────
-// Gère 1 instance audio partagée via ref
-// Usage : const music = useMusic('breathe');
-//         music.toggle() / music.playing
 const useMusic = (salle) => {
   const audioRef = React.useRef(null);
   const [playing, setPlaying] = React.useState(false);
@@ -451,10 +442,9 @@ const useMusic = (salle) => {
     const audio = new Audio(BASE_SOUNDS + file);
     audio.loop = true;
     audio.volume = 0.45;
-    audio.play().catch(() => {}); // silent fail si MP3 pas uploadé
+    audio.play().catch(() => {});
     audioRef.current = audio;
     setPlaying(true);
-    // Toast unique par salle
     if (!toastShown) {
       setToastShown(true);
       setShowToast(true);
@@ -466,14 +456,13 @@ const useMusic = (salle) => {
     playing ? stop() : play();
   }, [playing, stop, play]);
 
-  // Cleanup au démontage du composant
   React.useEffect(() => { return () => stop(); }, [stop]);
 
   return { playing, toggle, showToast };
 };
 
 // ─────────────────────────────────────────
-// GONG — Web Audio API (400Hz départ, 300Hz fin)
+// GONG — Web Audio API
 // ─────────────────────────────────────────
 const playGong = (freq, dur) => {
   try {
@@ -504,20 +493,40 @@ const gongEnd   = () => playGong(300, 5.5);
 // IMAGE RAW GITHUB
 // ─────────────────────────────────────────
 const RAW = 'https://raw.githubusercontent.com/lawalrachel-sudo/panda-zen/main/public/images/';
-const img = (file, alt, cls = 'panda-icon') =>
-  <img src={`${RAW}${file}`} alt={alt} className={cls} onError={e => { e.target.style.display = 'none'; }} />;
+const img = (file, alt, style = {}) =>
+  <img src={`${RAW}${file}`} alt={alt} style={{ objectFit: 'contain', ...style }}
+    onError={e => { e.target.style.display = 'none'; }} />;
+
+// ─────────────────────────────────────────
+// BOUTON MUSIQUE — composant réutilisable
+// CORRECTION : right:16 au lieu de left:0
+// ─────────────────────────────────────────
+const MusicBtn = ({ music }) => (
+  <>
+    <button onClick={music.toggle} style={{
+      position: 'absolute', top: 58, right: 16,
+      background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
+      borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
+    }}>{music.playing ? '🎵' : '🔇'}</button>
+    {music.showToast && (
+      <div style={{
+        position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
+        background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
+        padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
+      }}>🐼 Panda a choisi une musique pour cette salle</div>
+    )}
+  </>
+);
 
 // ─────────────────────────────────────────
 // ÉCRAN RESPIRATION — BREATHING V13
-// Props : galets, setGalets (depuis App.jsx)
 // ─────────────────────────────────────────
 const BreathScreen = ({ galets, setGalets }) => {
-  const [view, setView] = React.useState("welcome"); // welcome | explore | profil | exercise
+  const [view, setView] = React.useState("welcome");
   const [selectedKey, setSelectedKey] = React.useState(null);
   const [selectedEx, setSelectedEx] = React.useState(null);
   const [fromGuide, setFromGuide] = React.useState(false);
 
-  // Timer state
   const [duration, setDuration] = React.useState(60);
   const [timerLeft, setTimerLeft] = React.useState(60);
   const [timerTotal, setTimerTotal] = React.useState(60);
@@ -527,10 +536,11 @@ const BreathScreen = ({ galets, setGalets }) => {
   const intervalRef = React.useRef(null);
   const [completedEx, setCompletedEx] = React.useState({});
 
-  // Musique — salle Respiration = 'breathe'
   const music = useMusic('breathe');
 
-  const clearTimer = () => { if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; } };
+  const clearTimer = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+  };
 
   const resetTimerState = (dur = 60) => {
     clearTimer();
@@ -570,63 +580,46 @@ const BreathScreen = ({ galets, setGalets }) => {
 
   React.useEffect(() => { return () => clearTimer(); }, []);
 
+  // Scroll haut à chaque changement de vue interne
+  const goView = (v) => { setView(v); window.scrollTo(0, 0); };
+
   const profil = selectedKey ? BREATHING_DATA[selectedKey] : null;
   const KEYS = Object.keys(BREATHING_DATA);
 
   // ── WELCOME ──────────────────────────────────
   if (view === "welcome") return (
     <div className="screen" style={{ position: 'relative' }}>
-      {/* Icône musique — haut gauche */}
-      <button onClick={music.toggle} style={{
-        position: 'absolute', top: 0, left: 0,
-        background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
-        borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
-      }}>{music.playing ? '🎵' : '🔇'}</button>
-      {/* Toast musique unique */}
-      {music.showToast && (
-        <div style={{
-          position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
-          padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
-        }}>🐼 Panda a choisi une musique pour cette salle</div>
-      )}
-      <div style={{ textAlign: 'center', marginBottom: 14 }}>
-        {img('souffle.png', 'Panda respire', '')}
-      </div>
-      <div style={{ textAlign: 'center', marginBottom: 26 }}>
-        <h2 className="title-lg">Respiration</h2>
-        <p className="tagline-sm">18 exercices · 6 profils</p>
-      </div>
-      <button className="breath-cat-card" style={{ background: '#468a4d', color: 'white', borderLeft: 'none' }}
-        onClick={() => { setFromGuide(true); setSelectedKey('A'); setView('profil'); }}>
-        <div style={{ fontWeight: 800, fontSize: 16 }}>🐼 Panda me guide</div>
-        <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>Séance préparée selon ton profil</div>
-      </button>
-      <button className="breath-cat-card" onClick={() => setView('explore')}>
-        <div style={{ fontWeight: 800, fontSize: 16 }}>🔍 J'explore</div>
-        <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 4 }}>6 espaces · 18 exercices · tu choisis</div>
-      </button>
-      <div style={{ textAlign: 'center', marginTop: 18, fontSize: 12, color: '#bbb', fontWeight: 600 }}>
-        Chaque exercice terminé = <span style={{ color: '#c9a96e' }}>+2 galets 🪨</span>
+      <MusicBtn music={music} />
+      {/* paddingTop:48 = espace sous le bouton musique absolute (hauteur ~36px + marge) */}
+      <div style={{ paddingTop: 48 }}>
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          {img('souffle.png', 'Panda respire', { width: 80, height: 80, display: 'block', margin: '0 auto' })}
+        </div>
+        <div style={{ textAlign: 'center', marginBottom: 26 }}>
+          <h2 className="title-lg">Respiration</h2>
+          <p className="tagline-sm">18 exercices · 6 profils</p>
+        </div>
+        <button className="breath-cat-card" style={{ display: 'block', width: '100%', background: '#468a4d', color: 'white', borderLeft: 'none' }}
+          onClick={() => { setFromGuide(true); setSelectedKey('A'); goView('profil'); }}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>🐼 Panda me guide</div>
+          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>Séance préparée selon ton profil</div>
+        </button>
+        <button className="breath-cat-card" style={{ display: 'block', width: '100%' }} onClick={() => setView('explore')}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>🔍 J'explore</div>
+          <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 4 }}>6 espaces · 18 exercices · tu choisis</div>
+        </button>
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 15, color: '#5a4a3a', fontWeight: 800 }}>
+          Chaque exercice terminé&nbsp;=&nbsp;<span style={{ color: '#c9a96e' }}>+2</span>&nbsp;
+          <img src={`${RAW}GALET_SEUL.png`} alt="galet" style={{ width: 20, height: 20, objectFit: 'contain', verticalAlign: 'middle' }} />
+        </div>
       </div>
     </div>
   );
 
-  // ── EXPLORE (liste profils) ───────────────────
+  // ── EXPLORE ───────────────────────────────────
   if (view === "explore") return (
-    <div className="screen" style={{ position: 'relative' }}>
-      <button onClick={music.toggle} style={{
-        position: 'absolute', top: 0, left: 0,
-        background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
-        borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
-      }}>{music.playing ? '🎵' : '🔇'}</button>
-      {music.showToast && (
-        <div style={{
-          position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
-          padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
-        }}>🐼 Panda a choisi une musique pour cette salle</div>
-      )}
+    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+      <MusicBtn music={music} />
       <button className="breath-back" onClick={() => setView('welcome')}>← Retour</button>
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <h2 className="title-lg">J'explore</h2>
@@ -637,50 +630,30 @@ const BreathScreen = ({ galets, setGalets }) => {
         return (
           <button key={k} className="breath-cat-card fade-in"
             style={{ borderLeftColor: p.color, display: 'flex', alignItems: 'center', gap: 14 }}
-            onClick={() => { setSelectedKey(k); setFromGuide(false); setView('profil'); }}>
-            <img src={`${RAW}${p.badge}`} alt={p.animal}
-              style={{ width: 44, height: 44, objectFit: 'contain', flexShrink: 0 }}
-              onError={e => { e.target.style.display = 'none'; }} />
+            onClick={() => { setSelectedKey(k); setFromGuide(false); goView('profil'); }}>
+            {img(p.badge, p.animal, { width: 44, height: 44, flexShrink: 0 })}
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: 15 }}>{p.animal}</div>
               <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 2 }}>{p.phrase}</div>
             </div>
-            <img src={`${RAW}${p.img}`} alt={p.element}
-              style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }}
-              onError={e => { e.target.style.display = 'none'; }} />
+            {img(p.img, p.element, { width: 36, height: 36, flexShrink: 0 })}
           </button>
         );
       })}
     </div>
   );
 
-  // ── PROFIL (liste exercices) ──────────────────
+  // ── PROFIL ────────────────────────────────────
   if (view === "profil" && profil) return (
-    <div className="screen" style={{ position: 'relative' }}>
-      <button onClick={music.toggle} style={{
-        position: 'absolute', top: 0, left: 0,
-        background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
-        borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
-      }}>{music.playing ? '🎵' : '🔇'}</button>
-      {music.showToast && (
-        <div style={{
-          position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
-          padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
-        }}>🐼 Panda a choisi une musique pour cette salle</div>
-      )}
+    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+      <MusicBtn music={music} />
       <button className="breath-back" onClick={() => setView(fromGuide ? 'welcome' : 'explore')}>← Retour</button>
-      {/* Header profil */}
       <div style={{ textAlign: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(154,170,156,0.15)' }}>
-        <img src={`${RAW}${profil.badge}`} alt={profil.animal}
-          style={{ width: 68, height: 68, objectFit: 'contain', marginBottom: 8 }}
-          onError={e => { e.target.style.display = 'none'; }} />
+        {img(profil.badge, profil.animal, { width: 68, height: 68, display: 'block', margin: '0 auto 8px' })}
         <div style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1e270c', marginBottom: 6 }}>
           {profil.animal}
         </div>
-        <img src={`${RAW}${profil.img}`} alt={profil.element}
-          style={{ width: 30, height: 30, objectFit: 'contain', margin: '0 auto', display: 'block' }}
-          onError={e => { e.target.style.display = 'none'; }} />
+        {img(profil.img, profil.element, { width: 30, height: 30, display: 'block', margin: '0 auto' })}
       </div>
       {fromGuide && (
         <div style={{
@@ -695,17 +668,13 @@ const BreathScreen = ({ galets, setGalets }) => {
       {profil.exercises.map((ex, i) => (
         <button key={ex.id} className="breath-ex-card fade-in"
           style={{ animationDelay: `${i * 0.05}s` }}
-          onClick={() => { setSelectedEx(ex); resetTimerState(60); setView('exercise'); }}>
-          {/* TOP : nom + done + badge panda 28px (nouveauté V13) */}
+          onClick={() => { setSelectedEx(ex); resetTimerState(60); goView('exercise'); }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
             <div className="breath-ex-name" style={{ flex: 1 }}>{ex.name}</div>
             {completedEx[ex.id] && (
               <span style={{ background: '#468a4d', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}>✓</span>
             )}
-            {/* Badge panda 28px — nouveauté V13 */}
-            <img src={`${RAW}${profil.badge}`} alt=""
-              style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0, marginLeft: 6 }}
-              onError={e => { e.target.style.display = 'none'; }} />
+            {img(profil.badge, '', { width: 28, height: 28, flexShrink: 0, marginLeft: 6 })}
           </div>
           <div className="breath-ex-subtitle">{ex.subtitle}</div>
           <div className="breath-ex-duration">⏱️ {ex.duration}</div>
@@ -718,43 +687,31 @@ const BreathScreen = ({ galets, setGalets }) => {
   // ── EXERCISE + TIMER ──────────────────────────
   if (view === "exercise" && selectedEx && profil) return (
     <div className="screen" style={{ position: 'relative' }}>
-      <button onClick={music.toggle} style={{
-        position: 'absolute', top: 0, left: 0,
-        background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
-        borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
-      }}>{music.playing ? '🎵' : '🔇'}</button>
-      {music.showToast && (
-        <div style={{
-          position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
-          padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
-        }}>🐼 Panda a choisi une musique pour cette salle</div>
-      )}
+      <MusicBtn music={music} />
+
       {done ? (
-        /* ÉCRAN TERMINÉ */
+        // ── ÉCRAN TERMINÉ ──
         <>
-          <button className="breath-back" onClick={() => { clearTimer(); setDone(false); setView('profil'); }}>← Exercices</button>
+          <button className="breath-back" onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>← Exercices</button>
           <div style={{ textAlign: 'center', padding: '24px 16px 10px' }} className="fade-in">
-            <img src={`${RAW}pouce_v2.png`} alt="Bravo"
-              style={{ width: 90, height: 90, objectFit: 'contain', marginBottom: 14 }}
-              onError={e => { e.target.outerHTML = '<div style="font-size:72px;margin-bottom:14px">👍</div>'; }} />
+            {img('pouce_v2.png', 'Bravo', { width: 90, height: 90, display: 'block', margin: '0 auto 14px' })}
             <h3 style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 22, color: '#3a5a40', marginBottom: 8, fontWeight: 700 }}>Belle séance !</h3>
             <p style={{ fontSize: 13, color: '#5a4a3a', lineHeight: 1.7, marginBottom: 20, fontWeight: 600 }}>
               Prends le temps de te poser.<br />Ferme les yeux quelques instants si tu veux.<br />Et pense à boire de l'eau 💧
             </p>
-            {!completedEx[selectedEx.id] === false && (
-              <div style={{ color: '#c9a96e', fontWeight: 800, fontSize: 16, marginBottom: 16 }}>🪨 +2 galets</div>
-            )}
+            <div style={{ color: '#c9a96e', fontWeight: 800, fontSize: 16, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <img src={`${RAW}GALET_SEUL.png`} alt="galet" style={{ width: 22, height: 22, objectFit: 'contain' }} /> +2 galets
+            </div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               <button className="breath-timer-btn primary" style={{ flex: 1 }}
-                onClick={() => { clearTimer(); setDone(false); setView('profil'); }}>Autre exercice</button>
+                onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>Autre exercice</button>
               <button className="breath-timer-btn secondary" style={{ flex: 1 }}
-                onClick={() => { resetTimerState(duration); }}>Recommencer</button>
+                onClick={() => resetTimerState(duration)}>Recommencer</button>
             </div>
             {profil.salleApres && (
               <div style={{
                 background: 'rgba(255,255,255,0.8)', borderRadius: 14, padding: '14px 16px',
-                border: '1.5px solid rgba(201,169,110,0.2)', cursor: 'pointer', textAlign: 'left'
+                border: '1.5px solid rgba(201,169,110,0.2)', textAlign: 'left'
               }}>
                 <div style={{ fontSize: 11, color: '#9aaa9c', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 4 }}>
                   Et si tu poussais une autre porte ?
@@ -767,10 +724,17 @@ const BreathScreen = ({ galets, setGalets }) => {
           </div>
         </>
       ) : (
-        /* ÉCRAN EXERCICE */
+        // ── ÉCRAN EXERCICE ──
         <>
-          <button className="breath-back" onClick={() => { clearTimer(); setRunning(false); setPaused(false); setView('profil'); }}>← Exercices</button>
-          <div style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 20, fontWeight: 700, color: '#1e270c', marginBottom: 4 }}>{selectedEx.name}</div>
+          <button className="breath-back" onClick={() => { clearTimer(); setRunning(false); setPaused(false); goView('profil'); }}>← Exercices</button>
+
+          {/* Titre + badge profil — CORRECTION : badge visible à droite */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 20, fontWeight: 700, color: '#1e270c', flex: 1, paddingRight: 12 }}>
+              {selectedEx.name}
+            </div>
+            {img(profil.badge, profil.animal, { width: 40, height: 40, flexShrink: 0 })}
+          </div>
           <div style={{ fontSize: 13, color: '#5b7a5e', fontWeight: 600, lineHeight: 1.4, marginBottom: 16 }}>{selectedEx.subtitle}</div>
 
           {/* Box zen */}
@@ -791,13 +755,11 @@ const BreathScreen = ({ galets, setGalets }) => {
 
           {/* Zone timer */}
           <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: '18px 16px 16px', marginBottom: 14 }}>
+            {/* CORRECTION : panda timer centré */}
             <div style={{ textAlign: 'center', marginBottom: 10 }}>
-              <img src={`${RAW}panda_timer.png`} alt="Panda timer"
-                style={{ width: 68, height: 68, objectFit: 'contain' }}
-                onError={e => { e.target.outerHTML = '<div style="font-size:52px">⏱️</div>'; }} />
+              {img('panda_timer.png', 'Panda timer', { width: 68, height: 68, display: 'block', margin: '0 auto' })}
             </div>
             {!running && !paused ? (
-              /* Choisir durée */
               <>
                 <div style={{ fontSize: 11, fontWeight: 800, color: '#9aaa9c', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 8, textAlign: 'center' }}>Choisir la durée</div>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
@@ -822,7 +784,6 @@ const BreathScreen = ({ galets, setGalets }) => {
                 }} onClick={startTimer}>▶ Démarrer</button>
               </>
             ) : (
-              /* Timer en cours */
               <>
                 <div style={{ background: 'rgba(180,210,240,0.2)', borderRadius: 6, height: 5, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ height: '100%', background: 'linear-gradient(90deg,#5aacdf,#3a8ec4)', borderRadius: 6, width: `${pct}%`, transition: 'width 1s linear' }} />
@@ -839,7 +800,15 @@ const BreathScreen = ({ galets, setGalets }) => {
                       setPaused(false); setRunning(true);
                       intervalRef.current = setInterval(() => {
                         setTimerLeft(t => {
-                          if (t <= 1) { clearInterval(intervalRef.current); setRunning(false); setDone(true); gongEnd(); return 0; }
+                          if (t <= 1) {
+                            clearInterval(intervalRef.current);
+                            setRunning(false); setDone(true); gongEnd();
+                            if (selectedEx && !completedEx[selectedEx.id]) {
+                              setGalets(g => g + 2);
+                              setCompletedEx(prev => ({ ...prev, [selectedEx.id]: true }));
+                            }
+                            return 0;
+                          }
                           return t - 1;
                         });
                       }, 1000);
@@ -857,7 +826,6 @@ const BreathScreen = ({ galets, setGalets }) => {
             )}
           </div>
 
-          {/* Recommencer */}
           {(running || paused) && (
             <button style={{
               width: '100%', background: 'transparent', border: '1.5px solid rgba(70,138,77,0.3)',
@@ -885,7 +853,16 @@ const BreathScreen = ({ galets, setGalets }) => {
     </div>
   );
 
-  return null;
+  // FIX page blanche : si état incohérent, retour welcome
+  return (
+    <div className="screen" style={{ position: 'relative' }}>
+      <MusicBtn music={music} />
+      <button className="breath-back" onClick={() => setView('welcome')}>← Retour</button>
+      <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9aaa9c' }}>
+        Chargement...
+      </div>
+    </div>
+  );
 };
 
 export default BreathScreen;
