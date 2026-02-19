@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
+import BreathScreen from './components/BreathScreen';
 // ═══════════════════════════════════════
 // PANDA ZEN — APP COMPLÈTE v1
 // Fusion skeleton-v3 + profil-v5
@@ -118,16 +118,6 @@ const HomeScreen = ({ galets, streak, onNav }) => {
 // ═══════════════════════════════════════
 // ÉCRAN RESPIRER
 // ═══════════════════════════════════════
-const BreathScreen = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.breathe}</div>
-      <h2 className="title-lg">Respiration</h2>
-      <p className="module-desc">Des exercices adaptés selon ton profil — 18 techniques de cohérence cardiaque.</p>
-      <div className="phase-badge">⏳ Module breathing-v8 à intégrer</div>
-    </div>
-  </div>
-);
 
 // ═══════════════════════════════════════
 // ÉCRAN CARTE VITA
