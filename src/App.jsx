@@ -1037,4 +1037,3 @@ export default function PandaZenApp() {
     </>
   );
 }
-export default BreathScreen;
