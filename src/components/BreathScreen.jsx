@@ -888,38 +888,4 @@ const BreathScreen = ({ galets, setGalets }) => {
   return null;
 };
 
-// ═══════════════════════════════════════
-// CSS À AJOUTER DANS App.jsx (section <style>)
-// ═══════════════════════════════════════
-/*
-.breath-cat-card {
-  width: 100%; border: none; border-radius: 14px; padding: 14px 16px;
-  font-family: 'Nunito', sans-serif; cursor: pointer; text-align: left;
-  background: rgba(255,255,255,0.93); border-left: 4px solid #468a4d;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.15s; margin-bottom: 12px;
-}
-.breath-cat-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.breath-back {
-  background: rgba(240,237,232,0.8); border: none; border-radius: 10px;
-  padding: 7px 14px; font-size: 13px; color: #3a5a40; cursor: pointer;
-  margin-bottom: 18px; font-weight: 700; font-family: 'Nunito', sans-serif; display: inline-block;
-}
-.breath-ex-card {
-  background: white; border: 1px solid rgba(220,215,208,0.8); border-radius: 12px;
-  padding: 14px; cursor: pointer; width: 100%; text-align: left; margin-bottom: 10px;
-  transition: all 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  font-family: 'Nunito', sans-serif;
-}
-.breath-ex-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.breath-ex-name { font-weight: 800; font-size: 15px; color: #1e270c; }
-.breath-ex-subtitle { font-size: 12px; color: #666; margin-bottom: 5px; line-height: 1.4; }
-.breath-ex-duration { font-size: 11px; color: #9aaa9c; font-weight: 600; margin-bottom: 6px; }
-.breath-ex-cta { font-size: 12px; color: #468a4d; font-weight: 800; }
-.breath-timer-btn {
-  flex: 1; border: none; border-radius: 14px; padding: 13px 10px;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; cursor: pointer;
-}
-.breath-timer-btn.primary { background: #468a4d; color: white; }
-.breath-timer-btn.secondary { background: rgba(255,255,255,0.9); color: #3a5a40; border: 1.5px solid rgba(70,138,77,0.25); }
-
 export default BreathScreen;
