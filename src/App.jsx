@@ -1,1069 +1,870 @@
-import React, { useState, useEffect, useRef } from "react";
-import BreathScreen from './components/BreathScreen';
+import React from 'react';
+
 // ═══════════════════════════════════════
-// PANDA ZEN — APP COMPLÈTE v1
-// Fusion skeleton-v3 + profil-v5
-// 16/02/2026
+// MODULE BREATHING V13 CORRIGÉ - PANDA ZEN
+// Corrections 19/02/2026 :
+//   1. Animaux validés (Bernard-l'ermite, Fourmi Manioc, Dauphin)
+//   2. Bouton musique → droite (right:16) — ne chevauche plus ← Retour
+//   3. Badge profil visible dans vue exercise (haut droit)
+//   4. Panda timer centré (display:block, margin:0 auto)
+//   5. Page blanche fix — return null sécurisé
 // ═══════════════════════════════════════
 
-// PNG pandas transparents dans /images/
-const pi = (file, alt) => <img src={`/images/${file}`} alt={alt} className="panda-icon" loading="lazy" />;
-const P = {
-  logo:      pi('ORIGINAL.png', 'Panda Zen'),
-  original:  pi('ORIGINAL.png', 'Panda'),
-  hello:     pi('main_bonjour_bouche_ouverte.png', 'Hello'),
-  breathe:   pi('souffle.png', 'Respire'),
-  cards:     pi('Cartes.png', 'Cartes'),
-  water:     pi('bois_de_leau.png', 'Eau'),
-  mirror:    pi('miroir_positif.png', 'Miroir'),
-  mirrorNeg: pi('miroir_ne_gatif.png', 'Miroir négatif'),
-  relax:     pi('Relax.png', 'Relax'),
-  meditate:  pi('me_ditant.png', 'Méditation'),
-  thumbsUp:  pi('pouce_v2.png', 'Bravo'),
-  couple:    pi('Relationnel.png', 'Relations'),
-  galets:    pi('GALET_SEUL.png', 'Galet'),
-  envelope:  pi('enveloppe.png', 'Enveloppe'),
-  mudra:     pi('galets_zen_.png', 'Mudrâ'),
-  bambou:    pi('HOME_bambou.png', 'Accueil'),
-  pandaGalet: pi('panda_et_galet_gagne_.png', 'Galet gagné'),
+const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/video/upload/';
+const MUSIC_LIBRARY = {
+  zen:    ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3','zen_4_sbmwv1.mp3','zen_5_vywvrq.mp3'],
+  bols:   ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3'],
+  nature: ['zen_3_c6xvsz.mp3','zen_4_sbmwv1.mp3','zen_5_vywvrq.mp3']
+};
+const MUSIC_CONFIG = {
+  breathe:   'bols',
+  card:      'zen',
+  relax:     'nature',
+  water:     'nature',
+  relations: 'zen'
 };
 
-// ═══ DONNÉES PROFIL (démo) ═══
-const DEMO_RELATIONS = [
-  { id: 1, name: "Marc", type: "Partenaire", label: "Marc & Moi", profil: "C", animal: "🐢", animalName: "Tortue", date: "14/02/2026", complete: true, forceP: "Patience, Écoute", forceN: "Évitement, Repli", resume: "Avec Marc, j'active la Tortue : je me protège en me repliant dans ma carapace. Mes forces sont la patience et une écoute profonde — c'est ce qui nous a toujours tenus. Mais quand le stress monte, je fuis la confrontation au lieu d'exprimer ce que je ressens. Cette session m'a fait réaliser que ma carapace, qui me protège, m'empêche aussi de recevoir." },
-  { id: 2, name: "Maman", type: "Mère", label: "Maman & Moi", profil: "A", animal: "🦊", animalName: "Renard", date: "10/02/2026", complete: false, forceP: "Adaptabilité, Intelligence", forceN: "Manipulation, Méfiance", resume: "Avec Maman, je suis le Renard : je m'adapte, je trouve des solutions créatives à chaque situation. Mon intelligence relationnelle me permet de naviguer les conversations compliquées. Mais en stress, je ruse au lieu de dire ce que je ressens vraiment. J'ai pris conscience que ma méfiance envers ses réactions m'empêche d'être authentique." },
-  { id: 3, name: "Sophie", type: "Boss", label: "Sophie & Moi", profil: "E", animal: "🦔", animalName: "Hérisson", date: "05/02/2026", complete: true, forceP: "Sensibilité, Protection", forceN: "Piquants, Fermeture", resume: "Au travail avec Sophie, je suis le Hérisson : sensible à l'intérieur mais je sors les piquants dès que je me sens attaquée. Ma sensibilité est ma force — elle me rend empathique et intuitive. Mais en stress, je me ferme et mes piquants blessent sans que je le veuille. Cette prise de conscience m'a fait réaliser que mes protections sont aussi mes barrières." },
-];
+// ─────────────────────────────────────────
+// DONNÉES BREATHING — 18 EXERCICES (6 profils)
+// Animaux validés méthode VITA (test radiesthésique 04/02/2026)
+// ─────────────────────────────────────────
+const BREATHING_DATA = {
+  A: {
+    label: "CALMER",
+    profil: "Bernard-l'ermite · Feu",
+    besoin: "Lâcher, ralentir",
+    color: "#4a8fa8",
+    badge: "Badge_FEU__equilibre_.png",
+    img: "e_le_ment_feu.png",
+    animal: "Bernard-l'ermite",
+    element: "Feu",
+    phrase: "Laisser la pensée passer sans la retenir",
+    guideTxt: "Tu rumines et ton mental tourne. Ces respirations sont faites pour lâcher, pas pour contrôler.",
+    salleApres: { nom: "Carte VITA du jour", emoji: "🎴", tab: 2 },
+    exercises: [
+      {
+        id: "A1",
+        name: "Soupir Cyclique",
+        subtitle: "Double inspir + longue expir",
+        duration: "1–5 min",
+        zenTxt: "Imagine que chaque soupir libère une pensée qui tourne en boucle. Tu n'as rien à retenir. Juste laisser sortir, encore et encore.",
+        pratique: [
+          "Inspire une première fois par le nez, court et rapide — remplis tes poumons à moitié.",
+          "Enchaîne immédiatement une deuxième inspire, toujours par le nez — complète jusqu'au bout.",
+          "Expire lentement par la bouche sur 6 temps, les joues légèrement gonflées, sans forcer."
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou debout, yeux ouverts ou fermés",
+        astuces: "Si ton esprit repart, pas de jugement — reviens au soupir. C'est ça, la pratique.",
+        source: "Balban et al. (2023), Cell Reports Medicine, Stanford University."
+      },
+      {
+        id: "A2",
+        name: "Respiration 4-7-8",
+        subtitle: "Inspir · Rétention · Expir très longue",
+        duration: "1–3 min",
+        zenTxt: "Ce rythme particulier active ton frein naturel — le système parasympathique. Plus tu pratiques, plus il répond vite.",
+        pratique: [
+          "Inspire par le nez en 4 temps, régulièrement, pour remplir tes poumons.",
+          "Retiens le souffle poumons pleins pendant 7 temps. Si c'est trop long au début, commence à 4.",
+          "Expire par la bouche en 8 temps avec un léger son 'whoosh'. L'expiration longue, c'est la clé."
+        ],
+        reps: "4 cycles pour débuter, jusqu'à 8 avec la pratique",
+        position: "Assis, bout de la langue derrière les incisives supérieures",
+        astuces: "Le ratio 4-7-8 est plus important que la durée exacte. Adapte si besoin.",
+        source: "Dr Andrew Weil, MD (University of Arizona) — recommandée NHS UK."
+      },
+      {
+        id: "A3",
+        name: "Expiration Prolongée",
+        subtitle: "Expir = double de l'inspir (ratio 1:2)",
+        duration: "2–5 min",
+        zenTxt: "L'expiration longue envoie le signal de sécurité à ton corps. Pas besoin de chercher à te calmer — laisse l'expiration faire le travail.",
+        pratique: [
+          "Inspire par le nez en 4 temps, naturellement et sans forcer.",
+          "Expire par le nez ou la bouche en 8 temps — lentement, en laissant tout aller."
+        ],
+        reps: "En flux continu pendant la durée choisie",
+        position: "Assis, allongé ou debout selon ton envie",
+        astuces: "Place une main sur le ventre pour sentir le mouvement. C'est ton ancre.",
+        source: "HeartMath Institute — activation du nerf vague et système parasympathique."
+      }
+    ]
+  },
+  B: {
+    label: "ÉQUILIBRER",
+    profil: "Langouste · Feu",
+    besoin: "Structure, cadre",
+    color: "#c9a96e",
+    badge: "BADGE_FEU.png",
+    img: "e_le_ment_feu.png",
+    animal: "Langouste",
+    element: "Feu",
+    phrase: "Trouver une structure apaisante et stable",
+    guideTxt: "Tu as besoin de repères solides pour te sentir bien.",
+    salleApres: { nom: "Panda Relax", emoji: "🐾", tab: 3 },
+    exercises: [
+      {
+        id: "B1",
+        name: "Box Breathing",
+        subtitle: "Respiration Carrée — 4 temps égaux",
+        duration: "2–5 min",
+        zenTxt: "Quatre côtés égaux, un carré parfait. Le Box Breathing est utilisé par les Navy SEALs pour retrouver le calme sous pression. La structure régulière apaise le mental.",
+        pratique: [
+          "Inspire par le nez en 4 temps — remplis bien les poumons.",
+          "Retiens le souffle 4 temps, poumons pleins.",
+          "Expire par le nez en 4 temps — vide complètement.",
+          "Reste poumons vides 4 temps. C'est 1 cycle. Recommence."
+        ],
+        reps: "5 à 10 cycles (1 cycle = 16s)",
+        position: "Assis, dos droit, mains sur cuisses",
+        astuces: "Visualise un carré en dessinant chaque côté mentalement pendant chaque phase.",
+        source: "US Navy SEALs (Mark Divine) — HeartMath : effet stabilisant des ratios égaux."
+      },
+      {
+        id: "B2",
+        name: "Cohérence Cardiaque 5-5",
+        subtitle: "Ratio 1:1 strict, 6 respirations/min",
+        duration: "5 min",
+        zenTxt: "6 respirations par minute — c'est la fréquence de résonance du cœur humain. À ce rythme, cœur et cerveau entrent en harmonie. Simple, puissant, prouvé.",
+        pratique: [
+          "Inspire par le nez en 5 temps — régulier et fluide.",
+          "Expire par le nez ou la bouche en 5 temps — régulier et fluide.",
+          "Répète sans interruption. 30 cycles = 5 minutes complètes."
+        ],
+        reps: "30 cycles = 5 min (idéalement 3×/jour : matin, midi, soir)",
+        position: "Assis, relaxé",
+        astuces: "Ferme les yeux et place une main sur le cœur. Sens le rythme se stabiliser.",
+        source: "Dr David O'Hare 'Cohérence Cardiaque 365' (2012), HeartMath Institute."
+      },
+      {
+        id: "B3",
+        name: "Respiration Comptée Progressive",
+        subtitle: "Comptage croissant = ancrage de l'attention",
+        duration: "2–5 min",
+        zenTxt: "Compter progressivement occupe le mental, lui donnant un cadre précis. Chaque palier monte, puis redescend — comme une vague régulière qui ancre.",
+        pratique: [
+          "Commence par inspirer 2s / expirer 2s.",
+          "Monte d'un temps à chaque cycle : 3-3, 4-4, 5-5, 6-6.",
+          "Au sommet (6-6), redescends : 5-5, 4-4, 3-3, 2-2.",
+          "1 montée + 1 descente = 1 série. Fais 2 à 3 séries."
+        ],
+        reps: "2 à 3 séries complètes",
+        position: "Assis ou allongé",
+        astuces: "Si tu perds le compte, reprends à 2 sans te juger. Le compte, c'est l'outil, pas l'objectif.",
+        source: "Tradition méditative universelle (Vipassana, Zen) — comptage pour ancrage mental."
+      }
+    ]
+  },
+  C: {
+    label: "ANCRER / PROFONDEUR",
+    profil: "Fourmi Manioc · Terre",
+    besoin: "Profondeur, stabilité",
+    color: "#8b7355",
+    badge: "Badge_TERRE.png",
+    img: "e_le_ment_terre.png",
+    animal: "Fourmi Manioc",
+    element: "Terre",
+    phrase: "Trouver la profondeur et la stabilité en soi",
+    guideTxt: "Tu cherches à contrôler. Ces respirations t'invitent à descendre en toi, pas à maîtriser.",
+    salleApres: { nom: "Hydratation", emoji: "💧", tab: 4 },
+    exercises: [
+      {
+        id: "C1",
+        name: "Respiration Abdominale",
+        subtitle: "Diaphragmatique — Respirer par le ventre",
+        duration: "3–5 min",
+        zenTxt: "La respiration abdominale, c'est revenir à la respiration naturelle du nouveau-né — profonde, ventrale, instinctive. Ton corps sait déjà faire ça.",
+        pratique: [
+          "Assieds-toi ou allonge-toi. Place ta main droite sur le ventre, la gauche sur la poitrine.",
+          "Inspire par le nez en 5 temps — le ventre gonfle, la poitrine reste immobile.",
+          "Expire par le nez en 6 temps, lèvres légèrement pincées — le ventre rentre doucement."
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou allongé (allongé = plus facile pour sentir)",
+        astuces: "Si la poitrine monte en premier, ralentis. Le ventre doit mener.",
+        source: "American Lung Association — NHS UK recommandée pour anxiété et gestion douleur."
+      },
+      {
+        id: "C2",
+        name: "Respiration en Vague",
+        subtitle: "Body Scan Breath — Profondeur somatique",
+        duration: "3–5 min",
+        zenTxt: "Une vague chaude monte à l'inspiration, redescend à l'expiration. Ton corps entier participe. La profondeur ne vient pas de la tête — elle vient du ressenti.",
+        pratique: [
+          "Allonge-toi, yeux fermés. Inspire en 5 temps — vague chaude : pieds → jambes → ventre → poitrine → tête.",
+          "Temps plein 2s — vague au sommet.",
+          "Expire en 5 temps — vague redescend : tête → poitrine → ventre → jambes → pieds.",
+          "Temps vide 2s — vague se retire. Recommence."
+        ],
+        reps: "5 à 8 cycles",
+        position: "Allongé de préférence",
+        astuces: "Si la visualisation est difficile, concentre-toi juste sur la sensation de chaleur.",
+        source: "Sophrologie (Alfonso Caycedo) — Body scan MBSR (Jon Kabat-Zinn)."
+      },
+      {
+        id: "C3",
+        name: "Respiration Enracinement",
+        subtitle: "Grounding Breath — Connexion terre",
+        duration: "2–3 min",
+        zenTxt: "Pieds nus sur le sol, tu envoies des racines à chaque expiration. Ce n'est pas une métaphore — c'est une sensation corporelle réelle.",
+        pratique: [
+          "Assieds-toi, pieds nus au sol. Sens le contact des plantes de pieds avec le sol.",
+          "Inspire en 4 temps — chaleur monte : plante pieds → jambes → bassin → colonne.",
+          "Rétention 2s — énergie au centre du corps.",
+          "Expire en 6 temps — racines descendent de tes pieds dans le sol.",
+          "Rétention vide 2s — sens la stabilité."
+        ],
+        reps: "5 à 8 cycles",
+        position: "Assis pieds au sol (chaise ou sol)",
+        astuces: "Si tu es debout, c'est encore mieux. Le contact avec le sol amplifie la sensation.",
+        source: "Qi gong (Zhan Zhuang) — Oschman et al. (2015), Journal of Inflammation Research."
+      }
+    ]
+  },
+  D: {
+    label: "EXPRIMER",
+    profil: "Dauphin · Métal",
+    besoin: "Exprimer, sortir le son",
+    color: "#9e9e9e",
+    badge: "Badge_METAL.png",
+    img: "e_le_ment_me_tal.png",
+    animal: "Dauphin",
+    element: "Métal",
+    phrase: "Laisser sortir ce qui retient en dedans",
+    guideTxt: "Tu te retires souvent plutôt que d'exprimer. Ces respirations sonores t'invitent à laisser sortir — doucement.",
+    salleApres: { nom: "Relations", emoji: "🪞", tab: 5 },
+    exercises: [
+      {
+        id: "D1",
+        name: "Bhramari",
+        subtitle: "Abeille Bourdonnante — Vibration crâne et corps",
+        duration: "2–5 min",
+        zenTxt: "Le bourdonnement crée une vibration interne que tu peux sentir dans tes lèvres, ton nez, ton front. Ce son vient de toi — il t'appartient.",
+        pratique: [
+          "Assieds-toi dos droit, yeux fermés. Inspire profondément en 5 temps par le nez.",
+          "Expire en faisant 'HMMMM' grave et continu — bouche fermée, son qui dure 8 temps.",
+          "Sens la vibration : lèvres → nez → front → crâne → poitrine.",
+          "Reste dans le silence 3s après l'expiration. Écoute la résonance intérieure."
+        ],
+        reps: "3 à 7 cycles",
+        position: "Assis dos droit. Option : doigts sur cartilages des oreilles (Shanmukhi Mudra)",
+        astuces: "Plus le son est grave, plus la vibration descend dans le corps. Joue avec ça.",
+        source: "Hatha Yoga Pradipika — PMC 2024 (46 études) : effets sur tension artérielle, variabilité cardiaque, anxiété."
+      },
+      {
+        id: "D2",
+        name: "Ujjayi",
+        subtitle: "Souffle de l'Océan — Son de vague",
+        duration: "3–5 min",
+        zenTxt: "La gorge légèrement contractée crée un son de vague — inspirant et expirant. Ce son est ton ancre. Quand l'esprit part, reviens au son.",
+        pratique: [
+          "Bouche fermée, contracte légèrement l'arrière de la gorge — comme si tu voulais embuer un miroir avec la bouche fermée.",
+          "Inspire en 5 temps — son de vague entrante 'hhhhh' audible pour toi seul.",
+          "Expire en 6 temps — son de vague sortante 'haaaah' doux."
+        ],
+        reps: "En continu pendant la durée choisie",
+        position: "Assis ou pendant activité douce (marche lente, yoga)",
+        astuces: "Le son doit être audible par toi, pas par quelqu'un à 2m. Ni trop fort, ni trop faible.",
+        source: "Tradition Ashtanga Yoga (K. Pattabhi Jois) — régulation température + activation parasympathique."
+      },
+      {
+        id: "D3",
+        name: "Om / Souffle Chanté",
+        subtitle: "Vibration voyelle traversant le corps",
+        duration: "2–3 min",
+        zenTxt: "Om n'est pas une prière — c'est une vibration. O dans le ventre, U dans la poitrine, M dans le crâne. Ton corps devient instrument.",
+        pratique: [
+          "Inspire profondément en 5 temps.",
+          "Expire en chantant lentement : 'OOOO' 2s (ventre/bassin) → 'UUUU' 2s (poitrine/cœur) → 'MMMM' 4s (crâne/front, bouche se ferme).",
+          "Silence 3s — écoute la résonance."
+        ],
+        reps: "5 à 10 cycles",
+        position: "Assis dos droit",
+        astuces: "Variante simple si Om te bloque : juste 'AAAAAHHH' long sur toute l'expiration. Même effet libérateur.",
+        source: "Tradition védique (5000+ ans) — Mooventhan & Khode (2014, IJOY)."
+      }
+    ]
+  },
+  E: {
+    label: "ÉNERGISER",
+    profil: "Scarabée Rhino · Eau",
+    besoin: "Recharger, faire circuler",
+    color: "#5b7a5e",
+    badge: "BAdge_eau.png",
+    img: "e_le_ment_eau.png",
+    animal: "Scarabée Rhino",
+    element: "Eau",
+    phrase: "Recharger son énergie propre et retrouver son flux",
+    guideTxt: "Tu portes beaucoup pour les autres — souvent sans t'en rendre compte. Ces respirations dynamisantes sont pour toi, rien que pour toi.",
+    salleApres: { nom: "Carte VITA du jour", emoji: "🎴", tab: 2 },
+    exercises: [
+      {
+        id: "E1",
+        name: "Bhastrika",
+        subtitle: "Soufflet du Forgeron — activation puissante",
+        duration: "1–3 min",
+        zenTxt: "Bhastrika réveille ta force intérieure. Les pompages rapides oxygènent le sang en quelques secondes. La rétention crée un espace de silence rare.",
+        pratique: [
+          "Assieds-toi dos droit. Commence par 25 inspirations et expirations rapides par le nez — environ 1 par seconde. Ton ventre pompe activement.",
+          "Après les 25 cycles : inspire profondément en 3 temps, poumons pleins.",
+          "Retiens le souffle 15 à 20 secondes selon ton confort.",
+          "Expire lentement en 5 temps. Repose-toi 30 secondes. Recommence 3 fois."
+        ],
+        reps: "3 rounds complets avec pause entre chaque",
+        position: "Assis dos droit, mains sur les genoux",
+        astuces: "Si tu ressens des étourdissements, ralentis immédiatement. Pratique estomac vide.",
+        source: "Hatha Yoga Pradipika (~15e s.) — PMC confirme l'activation sympathique."
+      },
+      {
+        id: "E2",
+        name: "Kapalabhati",
+        subtitle: "Crâne Brillant — expirations actives",
+        duration: "1–3 min",
+        zenTxt: "Dans Kapalabhati, l'expiration est active — courte, sèche, nette. L'inspiration suit passivement, automatiquement. Ton corps reprend le contrôle.",
+        pratique: [
+          "Inspire une fois profondément pour commencer.",
+          "Enchaîne 30 expirations rapides et sèches par le nez — ton ventre rentre d'un coup à chaque fois. L'inspiration se fait seule, passivement.",
+          "Après les 30 cycles : grande inspiration, rétention 15 secondes, expiration lente.",
+          "Repose-toi et recommence. 3 rounds au total."
+        ],
+        reps: "3 rounds de 30 expirations avec pause",
+        position: "Assis dos droit",
+        astuces: "C'est le ventre qui travaille, pas les poumons. Concentre-toi sur le mouvement abdominal.",
+        source: "Hatha Yoga Pradipika — PMC : amélioration capacité pulmonaire et éveil mental."
+      },
+      {
+        id: "E3",
+        name: "Respiration Dynamisante",
+        subtitle: "Souffle + mouvement = circulation",
+        duration: "1–2 min",
+        zenTxt: "Le mouvement des bras amplifie la respiration — l'énergie circule mieux quand le corps est en jeu. Simple pour se sentir vivant rapidement.",
+        pratique: [
+          "Debout, pieds à largeur des hanches. Lève les bras vers le haut en inspirant par le nez en 2 temps.",
+          "Redescends les bras le long du corps en expirant par la bouche en 2 temps.",
+          "Accélère progressivement jusqu'à un rythme rapide sur 10 à 20 répétitions.",
+          "Termine par une grande inspiration bras en l'air, rétention 5 secondes, expiration lente bras qui descendent."
+        ],
+        reps: "10 à 20 répétitions, 1 à 2 séries",
+        position: "Debout, pieds à largeur des hanches",
+        astuces: "Sens l'énergie dans tes bras à chaque inspiration. Laisse-la descendre dans tes jambes à l'expiration.",
+        source: "Qi gong et yoga dynamique — association mouvement/souffle pour activation circulatoire."
+      }
+    ]
+  },
+  F: {
+    label: "PURIFIER / RÉVÉLER",
+    profil: "Abeille · Bois",
+    besoin: "Libérer, révéler",
+    color: "#3a5a40",
+    badge: "Badge_AIR.png",
+    img: "e_le_ment_bois.png",
+    animal: "Abeille",
+    element: "Bois",
+    phrase: "Déposer le masque et laisser émerger ce qui est vrai",
+    guideTxt: "Tu souris souvent pour les autres, même quand ce n'est pas ce que tu ressens vraiment. Ces respirations créent un espace rien qu'à toi — sans public, sans rôle.",
+    salleApres: { nom: "Mon Miroir du jour", emoji: "🪞", tab: 5 },
+    exercises: [
+      {
+        id: "F1",
+        name: "Nadi Shodhana",
+        subtitle: "Narines Alternées — équilibre des hémisphères",
+        duration: "3–5 min",
+        zenTxt: "Alterner les narines équilibre les deux hémisphères — intuition et logique, douceur et clarté. Une des pratiques les plus puissantes pour retrouver son centre.",
+        pratique: [
+          "Assieds-toi dos droit. Main gauche sur le genou gauche. Utilise le pouce droit pour la narine droite, l'annulaire pour la narine gauche.",
+          "Ferme la narine droite — inspire par la narine gauche en 4 temps.",
+          "Ferme les deux narines — rétention 2 temps.",
+          "Ouvre la narine droite — expire en 6 temps. Puis inspire par la narine droite en 4 temps. Rétention 2 temps. Expire gauche 6 temps. C'est 1 cycle."
+        ],
+        reps: "5 à 10 cycles complets",
+        position: "Assis dos droit, main gauche posée sur le genou",
+        astuces: "Ne force pas la rétention. Si 2 temps te semble trop court, commence sans rétention.",
+        source: "Yoga Sutras de Patanjali (~400 CE) — PMC : équilibrage du système nerveux autonome."
+      },
+      {
+        id: "F2",
+        name: "Respiration 3 Parties",
+        subtitle: "Dirga — remplissage complet",
+        duration: "3–5 min",
+        zenTxt: "On remplit rarement nos poumons complètement. Cette respiration explore leur pleine capacité — une façon de te réapproprier l'espace que tu occupes.",
+        pratique: [
+          "Inspire d'abord dans le ventre en 3 temps — il se gonfle.",
+          "Continue l'inspiration dans la poitrine en 2 temps — la cage thoracique s'ouvre.",
+          "Termine en 1 temps jusqu'aux clavicules — l'air remplit la totalité des poumons.",
+          "Expire lentement en 8 temps dans l'ordre inverse : clavicules, poitrine, ventre."
+        ],
+        reps: "5 à 8 cycles lents et conscients",
+        position: "Assis ou allongé, sans contrainte",
+        astuces: "Ne force pas le remplissage. Laisse chaque région s'ouvrir à son rythme.",
+        source: "Yoga classique — Dirga signifie 'complet' en sanskrit."
+      },
+      {
+        id: "F3",
+        name: "Sithali",
+        subtitle: "Souffle Rafraîchissant — Purifier par le frais",
+        duration: "2–3 min",
+        zenTxt: "L'air qui traverse la langue enroulée arrive frais dans la gorge. Une sensation physique réelle. Respirer du frais, relâcher ce qui chauffe.",
+        pratique: [
+          "Enroule ta langue en U et dépasse-la légèrement entre tes lèvres.",
+          "Inspire par le nez en 4 temps à travers la langue — tu sens l'air frais.",
+          "Ferme la bouche, expire par le nez en 6 temps, doucement.",
+          "Si tu ne peux pas enrouler la langue, garde les dents légèrement serrées et inspire entre elles — même effet, c'est le Sitkari."
+        ],
+        reps: "5 à 10 cycles tranquilles",
+        position: "Assis confortablement",
+        astuces: "Environ 35% des personnes ne peuvent pas enrouler la langue — c'est génétique, pas un problème.",
+        source: "Hatha Yoga Pradipika — réduction de température corporelle perçue documentée."
+      }
+    ]
+  }
+};
 
-const DEMO_CARTES = [
-  { num: 3, phrase: "Plus vous êtes heureux, plus vous êtes présent à ce qui est bon, maintenant." },
-  { num: 7, phrase: "Trouvez des raisons de vous apprécier." },
-  { num: 39, phrase: "Ayez des pensées qui vous apportent satisfaction." },
-  { num: 22, phrase: "Ce que vous ressentez n'est jamais le problème, c'est la solution." },
-];
+// ─────────────────────────────────────────
+// HOOK MUSIQUE — useMusic
+// ─────────────────────────────────────────
+const useMusic = (salle) => {
+  const audioRef = React.useRef(null);
+  const [playing, setPlaying] = React.useState(false);
+  const [toastShown, setToastShown] = React.useState(false);
+  const [showToast, setShowToast] = React.useState(false);
 
-const DEMO_FILLEULS = [
-  { name: "Julie", date: "12/02/2026", type: "gratuit", galets: 1 },
-  { name: "Amine", date: "08/02/2026", type: "payant", galets: 2 },
-];
+  const stop = React.useCallback(() => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    setPlaying(false);
+  }, []);
 
-const MUDRAS_PALIERS = [
-  { day: 3, num: 1 },
-  { day: 5, num: 2 },
-  { day: 7, num: 3 },
-  { day: 14, num: 4 },
-  { day: 19, num: 5 },
-  { day: 24, num: 6 },
-  { day: 30, num: 7 },
-  { day: 32, num: 8 },
-  { day: 33, num: 9, special: true },
-  { day: 36, num: 10 },
-  { day: 40, num: 11 },
-  { day: 45, num: 12 },
-  { day: 50, num: 13 },
-  { day: 55, num: 14 },
-  { day: 60, num: 15 },
-  { day: 65, num: 16 },
-  { day: 70, num: 17 },
-  { day: 73, num: 18, final: true },
-];
+  const play = React.useCallback(() => {
+    stop();
+    const cat = MUSIC_CONFIG[salle] || 'zen';
+    const lib = MUSIC_LIBRARY[cat];
+    const file = lib[Math.floor(Math.random() * lib.length)];
+    const audio = new Audio(BASE_SOUNDS + file);
+    audio.loop = true;
+    audio.volume = 0.45;
+    audio.play().catch(() => {});
+    audioRef.current = audio;
+    setPlaying(true);
+    if (!toastShown) {
+      setToastShown(true);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  }, [salle, stop, toastShown]);
 
-// ═══════════════════════════════════════
-// ÉCRAN ACCUEIL v2
-// ═══════════════════════════════════════
-const HomeScreen = ({ galets, streak, onNav }) => {
-  const actions = [
-    { p: P.cards, t: "Carte VITA du jour", d: "Ton message VITA® quotidien", tab: 2, g: 1 },
-    { p: P.relax, t: "Panda Relax", d: "16 animaux totems pour t'accompagner dans les 64 exercices", tab: 3, g: 3 },
-    { p: P.breathe, t: "Respiration", d: "Des exercices adaptés selon ton profil", tab: 1, g: 2 },
-    { p: P.couple, t: "Relations", d: "Découvre ton profil dans tes relations", tab: 5, g: 5 },
-    { p: P.water, t: "Hydratation", d: "S'hydrater pour éliminer", tab: 4, g: 1 },
-  ];
-  return (
-    <div className="screen">
-      <div className="home-hero">
-        <div className="home-hero-panda">{P.hello}</div>
-        <div>
-          <h2 className="home-greeting">Bienvenue !</h2>
-          <p className="home-tagline">Mieux te comprendre et avancer en 3 minutes par jour.</p>
+  const toggle = React.useCallback(() => {
+    playing ? stop() : play();
+  }, [playing, stop, play]);
+
+  React.useEffect(() => { return () => stop(); }, [stop]);
+
+  return { playing, toggle, showToast };
+};
+
+// ─────────────────────────────────────────
+// GONG — Web Audio API
+// ─────────────────────────────────────────
+const playGong = (freq, dur) => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const gain2 = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc2.connect(gain2); gain2.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc2.frequency.value = freq * 1.003;
+    osc.type = 'sine'; osc2.type = 'sine';
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    gain2.gain.setValueAtTime(0, ctx.currentTime);
+    gain2.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.08);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + dur);
+    osc2.start(ctx.currentTime); osc2.stop(ctx.currentTime + dur);
+  } catch(e) {}
+};
+const gongStart = () => playGong(400, 3.5);
+const gongEnd   = () => playGong(300, 5.5);
+
+// ─────────────────────────────────────────
+// IMAGE RAW GITHUB
+// ─────────────────────────────────────────
+const RAW = 'https://raw.githubusercontent.com/lawalrachel-sudo/panda-zen/main/public/images/';
+const img = (file, alt, style = {}) =>
+  <img src={`${RAW}${file}`} alt={alt} style={{ objectFit: 'contain', ...style }}
+    onError={e => { e.target.style.display = 'none'; }} />;
+
+// ─────────────────────────────────────────
+// BOUTON MUSIQUE — composant réutilisable
+// CORRECTION : right:16 au lieu de left:0
+// ─────────────────────────────────────────
+const MusicBtn = ({ music }) => (
+  <>
+    {/* Bouton son — position fixe bas droite, au-dessus de la nav (bottom:72px) */}
+    <button onClick={music.toggle} style={{
+      position: 'fixed', bottom: 72, right: 16,
+      background: 'rgba(255,255,255,0.92)', border: '1px solid rgba(154,170,156,0.25)',
+      borderRadius: 12, padding: '8px 12px', fontSize: 18, cursor: 'pointer',
+      zIndex: 90, boxShadow: '0 2px 10px rgba(0,0,0,0.12)'
+    }}>{music.playing ? '🎵' : '🔇'}</button>
+    {music.showToast && (
+      <div style={{
+        position: 'fixed', bottom: 122, right: 16,
+        background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
+        padding: '8px 14px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
+      }}>🐼 musique pour cette salle</div>
+    )}
+  </>
+);
+
+// ─────────────────────────────────────────
+// ÉCRAN RESPIRATION — BREATHING V13
+// ─────────────────────────────────────────
+const BreathScreen = ({ galets, setGalets }) => {
+  const [view, setView] = React.useState("welcome");
+  const [selectedKey, setSelectedKey] = React.useState(null);
+  const [selectedEx, setSelectedEx] = React.useState(null);
+  const [fromGuide, setFromGuide] = React.useState(false);
+
+  const [duration, setDuration] = React.useState(60);
+  const [timerLeft, setTimerLeft] = React.useState(60);
+  const [timerTotal, setTimerTotal] = React.useState(60);
+  const [running, setRunning] = React.useState(false);
+  const [paused, setPaused] = React.useState(false);
+  const [done, setDone] = React.useState(false);
+  const intervalRef = React.useRef(null);
+  const [completedEx, setCompletedEx] = React.useState({});
+
+  const music = useMusic('breathe');
+
+  const clearTimer = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+  };
+
+  const resetTimerState = (dur = 60) => {
+    clearTimer();
+    setRunning(false); setPaused(false); setDone(false);
+    setDuration(dur); setTimerLeft(dur); setTimerTotal(dur);
+  };
+
+  const startTimer = () => {
+    clearTimer();
+    gongStart();
+    setRunning(true); setPaused(false);
+    setTimerTotal(duration); setTimerLeft(duration);
+    intervalRef.current = setInterval(() => {
+      setTimerLeft(t => {
+        if (t <= 1) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setRunning(false);
+          setDone(true);
+          gongEnd();
+          if (selectedEx && !completedEx[selectedEx.id]) {
+            setGalets(g => g + 2);
+            setCompletedEx(prev => ({ ...prev, [selectedEx.id]: true }));
+          }
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+  };
+
+  const fmtTime = (s) => s >= 60
+    ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+    : `${s}s`;
+
+  const pct = timerTotal > 0 ? ((timerTotal - timerLeft) / timerTotal * 100) : 0;
+
+  React.useEffect(() => { return () => clearTimer(); }, []);
+
+  // Scroll haut à chaque changement de vue interne
+  const goView = (v) => { setView(v); window.scrollTo(0, 0); };
+
+  const profil = selectedKey ? BREATHING_DATA[selectedKey] : null;
+  const KEYS = Object.keys(BREATHING_DATA);
+
+  // ── WELCOME ──────────────────────────────────
+  if (view === "welcome") return (
+    <div className="screen" style={{ position: 'relative' }}>
+      <MusicBtn music={music} />
+      {/* paddingTop:48 = espace sous le bouton musique absolute (hauteur ~36px + marge) */}
+      <div style={{ paddingTop: 48 }}>
+        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+          {img('souffle.png', 'Panda respire', { width: 80, height: 80, display: 'block', margin: '0 auto' })}
+        </div>
+        <div style={{ textAlign: 'center', marginBottom: 26 }}>
+          <h2 className="title-lg">Respiration</h2>
+          <p className="tagline-sm">18 exercices · 6 profils</p>
+        </div>
+        <button className="breath-cat-card" style={{ display: 'block', width: '100%', background: '#468a4d', color: 'white', borderLeft: 'none' }}
+          onClick={() => { setFromGuide(true); setSelectedKey('A'); goView('profil'); }}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>🐼 Panda me guide</div>
+          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>Séance préparée selon ton profil</div>
+        </button>
+        <button className="breath-cat-card" style={{ display: 'block', width: '100%' }} onClick={() => setView('explore')}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>🔍 J'explore</div>
+          <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 4 }}>6 espaces · 18 exercices · tu choisis</div>
+        </button>
+        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 15, color: '#5a4a3a', fontWeight: 800 }}>
+          Chaque exercice terminé&nbsp;=&nbsp;<span style={{ color: '#c9a96e' }}>+2</span>&nbsp;
+          <img src={`${RAW}GALET_SEUL.png`} alt="galet" style={{ width: 20, height: 20, objectFit: 'contain', verticalAlign: 'middle' }} />
         </div>
       </div>
-      <div className="home-stats">
-        <div className="home-stat-card"><div className="home-stat-icon">{P.galets}</div><div className="home-stat-val gold">{galets}</div><div className="home-stat-label">galets récoltés</div></div>
-        <div className="home-stat-card"><div className="home-stat-icon">🔥</div><div className="home-stat-val orange">{streak}</div><div className="home-stat-label">jours de suite</div></div>
+    </div>
+  );
+
+  // ── EXPLORE ───────────────────────────────────
+  if (view === "explore") return (
+    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+      <MusicBtn music={music} />
+      <button className="breath-back" onClick={() => setView('welcome')}>← Retour</button>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <h2 className="title-lg">J'explore</h2>
+        <p className="tagline-sm">Choisis toi-même ton besoin du moment</p>
       </div>
-      {/* MIROIR DU JOUR — CTA PRINCIPAL */}
-      <button className="miroir-cta-home" onClick={() => onNav(6)}>
-        <div className="miroir-cta-panda">{P.mirror}</div>
-        <div className="miroir-cta-title">Mon Miroir du jour</div>
-        <div className="miroir-cta-desc">Découvre quel profil tu actives aujourd'hui · 3 min</div>
-        <div className="miroir-cta-badge"><span className="galet-inline">{P.galets}</span> +5</div>
-        <div className="miroir-cta-btn">C'est parti !</div>
-      </button>
-      <h3 className="home-section-title">Ton chemin zen</h3>
-      {actions.map((a, i) => (
-        <button key={i} className="home-action" onClick={() => a.tab !== null && onNav(a.tab)} style={{ animationDelay: `${i * 0.06}s` }}>
-          <div className="home-action-panda">{a.p}</div>
-          <div className="home-action-text">
-            <div className="home-action-title">{a.t}</div>
-            <div className="home-action-desc">{a.d}</div>
+      {KEYS.map(k => {
+        const p = BREATHING_DATA[k];
+        return (
+          <button key={k} className="breath-cat-card fade-in"
+            style={{ borderLeftColor: p.color, display: 'flex', alignItems: 'center', gap: 14 }}
+            onClick={() => { setSelectedKey(k); setFromGuide(false); goView('profil'); }}>
+            {img(p.badge, p.animal, { width: 44, height: 44, flexShrink: 0 })}
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <div style={{ fontWeight: 800, fontSize: 15 }}>{p.animal}</div>
+              <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 2 }}>{p.phrase}</div>
+            </div>
+            {img(p.img, p.element, { width: 36, height: 36, flexShrink: 0 })}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  // ── PROFIL ────────────────────────────────────
+  if (view === "profil" && profil) return (
+    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+      <MusicBtn music={music} />
+      <button className="breath-back" onClick={() => setView(fromGuide ? 'welcome' : 'explore')}>← Retour</button>
+      <div style={{ textAlign: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(154,170,156,0.15)' }}>
+        {img(profil.badge, profil.animal, { width: 68, height: 68, display: 'block', margin: '0 auto 8px' })}
+        <div style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1e270c', marginBottom: 6 }}>
+          {profil.animal}
+        </div>
+        {img(profil.img, profil.element, { width: 30, height: 30, display: 'block', margin: '0 auto' })}
+      </div>
+      {fromGuide && (
+        <div style={{
+          background: 'rgba(70,138,77,0.07)', borderLeft: '3px solid #468a4d',
+          borderRadius: '0 12px 12px 0', padding: '12px 14px',
+          fontSize: 13, color: '#2d3a2e', lineHeight: 1.65, fontStyle: 'italic', marginBottom: 16
+        }}>{profil.guideTxt}</div>
+      )}
+      <div style={{ fontSize: 11, fontWeight: 800, color: '#9aaa9c', letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 10 }}>
+        Les 3 respirations
+      </div>
+      {profil.exercises.map((ex, i) => (
+        <button key={ex.id} className="breath-ex-card fade-in"
+          style={{ animationDelay: `${i * 0.05}s` }}
+          onClick={() => { setSelectedEx(ex); resetTimerState(60); goView('exercise'); }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <div className="breath-ex-name" style={{ flex: 1 }}>{ex.name}</div>
+            {completedEx[ex.id] && (
+              <span style={{ background: '#468a4d', color: 'white', width: 20, height: 20, borderRadius: '50%', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}>✓</span>
+            )}
+            {img(profil.badge, '', { width: 28, height: 28, flexShrink: 0, marginLeft: 6 })}
           </div>
-          <div className="home-galet-badge"><span className="galet-inline">{P.galets}</span> +{a.g}</div>
+          <div className="breath-ex-subtitle">{ex.subtitle}</div>
+          <div className="breath-ex-duration">⏱️ {ex.duration}</div>
+          <div className="breath-ex-cta">Commencer →</div>
         </button>
       ))}
     </div>
   );
-};
 
-// ═══════════════════════════════════════
-// ÉCRAN RESPIRER
-// ═══════════════════════════════════════
+  // ── EXERCISE + TIMER ──────────────────────────
+  if (view === "exercise" && selectedEx && profil) return (
+    <div className="screen" style={{ position: 'relative' }}>
+      <MusicBtn music={music} />
 
-// ═══════════════════════════════════════
-// ÉCRAN CARTE VITA
-// ═══════════════════════════════════════
-const CardScreen = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.cards}</div>
-      <h2 className="title-lg">Carte VITA du jour</h2>
-      <p className="module-desc">72 cartes VITA®<br/>3 niveaux de lecture<br/>Bambou : Feuille, Nœud, Racine.</p>
-      <div className="phase-badge">Tirage 1 ou 2 cartes VITA/jour à comprendre et intégrer.</div>
-    </div>
-  </div>
-);
-
-// ═══════════════════════════════════════
-// ÉCRAN PANDA RELAX
-// ═══════════════════════════════════════
-const RelaxScreen = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.relax}</div>
-      <h2 className="title-lg">Panda Relax</h2>
-      <p className="module-desc">16 animaux totems · 64 exercices corps & émotions.<br/>Découvre ton animal totem et laisse-toi guider.</p>
-      <div className="phase-badge">⏳ 16 fiches exercices à intégrer</div>
-    </div>
-  </div>
-);
-
-// ═══════════════════════════════════════
-// ÉCRAN HYDRATATION — FONCTIONNEL
-// ═══════════════════════════════════════
-const WaterScreen = ({ galets, setGalets }) => {
-  const [glasses, setGlasses] = useState(0);
-  const [goalMl, setGoalMl] = useState(1600); // 1L à 2L par défaut 1.6L
-  const glassSize = 200; // ml par verre
-  const goal = Math.round(goalMl / glassSize);
-  const [showInfo, setShowInfo] = useState(false);
-  const pct = Math.min(100, Math.round((glasses / goal) * 100));
-  const weekData = [5, 7, 8, 6, 4, 8];
-  const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
-  const [galetEarned, setGaletEarned] = useState({g70:false, g100:false});
-  const [reminderStart, setReminderStart] = useState(8);
-  const [reminderEnd, setReminderEnd] = useState(20);
-  const goalOptions = [1000, 1200, 1400, 1600, 1800, 2000];
-  const add = () => {
-    if (glasses >= goal) return;
-    const next = glasses + 1;
-    setGlasses(next);
-    const nextPct = Math.round((next / goal) * 100);
-    if (nextPct >= 70 && !galetEarned.g70) { setGalets(g => g + 1); setGaletEarned(e => ({...e, g70:true})); }
-    if (nextPct >= 100 && !galetEarned.g100) { setGalets(g => g + 2); setGaletEarned(e => ({...e, g100:true})); }
-  };
-  return (
-    <div className="screen">
-      <div className="water-header">
-        <div className="water-panda">{pct >= 100 ? P.thumbsUp : P.water}</div>
-        <div>
-          <h2 className="title-lg">Hydratation</h2>
-          <p className="tagline-sm">{pct >= 100 ? "Objectif atteint ! Bravo !" : "S'hydrater pour éliminer."}</p>
-        </div>
-      </div>
-      <button className="water-info-toggle" onClick={() => setShowInfo(!showInfo)}>{showInfo ? "â–¼" : "â–¶"} Pourquoi c'est important ?</button>
-      {showInfo && (
-        <div className="water-info-text fade-in">
-          L'eau représente 60% de ton corps. Une bonne hydratation améliore ta concentration, ton humeur et ta digestion. Adapte ton objectif à ta morphologie et tes activités. Le rappel te permet de répartir tes verres sur la journée.
-        </div>
-      )}
-      <div className="water-main fade-in">
-        <div className="circle-wrap">
-          <svg className="circle-svg" viewBox="0 0 180 180">
-            <circle cx="90" cy="90" r="78" className="circle-bg" />
-            <circle cx="90" cy="90" r="78" className="circle-fill" strokeDasharray={`${2*Math.PI*78}`} strokeDashoffset={`${2*Math.PI*78*(1-pct/100)}`} />
-          </svg>
-          <div className="circle-center">
-            <div className="circle-num">{glasses}</div>
-            <div className="circle-label">/ {goal} verres</div>
-          </div>
-        </div>
-        <div className="water-btns">
-          <button className="water-minus" onClick={() => glasses > 0 && setGlasses(g => g - 1)}>−</button>
-          <button className="water-plus" onClick={add}>+</button>
-        </div>
-      </div>
-
-      {/* OBJECTIF + GALETS */}
-      <div className="card water-goal-card fade-in" style={{ animationDelay: "0.05s" }}>
-        <span className="card-title-sm">Mon objectif : {goalMl/1000}L ({goal} verres de {glassSize}ml)</span>
-        <div className="goal-options">
-          {goalOptions.map(ml => (
-            <button key={ml} className={`goal-btn ${goalMl===ml?"active":""}`} onClick={() => { setGoalMl(ml); setGlasses(0); setGaletEarned({g70:false,g100:false}); }}>{ml/1000}L</button>
-          ))}
-        </div>
-        <div className="water-galet-rewards">
-          <div className={`water-reward-row ${galetEarned.g70 ? "earned" : ""}`}>
-            <span className="water-reward-label">Objectif 70%</span>
-            <span className="water-reward-val"><span className="galet-inline">{P.galets}</span> ×1 {galetEarned.g70 && <span className="water-check">✓</span>}</span>
-          </div>
-          <div className={`water-reward-row ${galetEarned.g100 ? "earned" : ""}`}>
-            <span className="water-reward-label">Objectif 100%</span>
-            <span className="water-reward-val"><span className="galet-inline">{P.galets}</span> ×2 {galetEarned.g100 && <span className="water-check">✓</span>}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA MODULE */}
-      <button className="water-module-cta fade-in" style={{ animationDelay: "0.1s" }}>
-        💧 Mieux comprendre, mieux s'hydrater
-      </button>
-
-      {/* RAPPELS */}
-      <div className="card fade-in" style={{ animationDelay: "0.12s" }}>
-        <span className="card-title-sm">🔔 Rappels hydratation</span>
-        <p className="water-reminder-desc">Reçois un rappel pour boire régulièrement. On fragmente ton objectif sur ta journée.</p>
-        <div className="water-reminder-config">
-          <div className="reminder-row">
-            <span className="reminder-label">De</span>
-            <select className="reminder-select" value={reminderStart} onChange={e => setReminderStart(+e.target.value)}>
-              {[6,7,8,9,10].map(h => <option key={h} value={h}>{h}h00</option>)}
-            </select>
-            <span className="reminder-label">à</span>
-            <select className="reminder-select" value={reminderEnd} onChange={e => setReminderEnd(+e.target.value)}>
-              {[18,19,20,21,22].map(h => <option key={h} value={h}>{h}h00</option>)}
-            </select>
-          </div>
-          <p className="reminder-calc">
-            {goal} verres en {reminderEnd - reminderStart}h = 1 rappel toutes les {Math.round((reminderEnd - reminderStart) * 60 / goal)} min
-          </p>
-        </div>
-        <button className="water-reminder-btn" onClick={() => {
-          const interval = Math.round((reminderEnd - reminderStart) * 60 / goal);
-          const now = new Date();
-          const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-          let events = '';
-          for (let i = 0; i < goal; i++) {
-            const totalMin = reminderStart * 60 + i * interval;
-            const hh = String(Math.floor(totalMin/60)).padStart(2,'0');
-            const mm = String(totalMin%60).padStart(2,'0');
-            events += `BEGIN:VEVENT\nDTSTART:${y}${m}${d}T${hh}${mm}00\nDTSTAMP:${y}${m}${d}T${hh}${mm}00\nDURATION:PT1M\nSUMMARY:💧 Verre ${i+1}/${goal} — Panda Zen\nDESCRIPTION:C'est l'heure de boire ! Objectif : ${goalMl/1000}L aujourd'hui.\nBEGIN:VALARM\nTRIGGER:PT0M\nACTION:DISPLAY\nDESCRIPTION:Bois un verre d eau\nEND:VALARM\nEND:VEVENT\n`;
-          }
-          const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PandaZen//Hydratation//FR\nCALSCALE:GREGORIAN\n${events}END:VCALENDAR`;
-          const blob = new Blob([ics], { type: 'text/calendar' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url; a.download = `panda-zen-hydratation-${y}${m}${d}.ics`;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }}>
-          📲 Ajouter les rappels à mon calendrier
-        </button>
-        <p className="reminder-note">Fonctionne sur iPhone et Android. Les rappels s'ajoutent à ton calendrier avec notification sonore.</p>
-      </div>
-
-      {/* GRAPHIQUE SEMAINE */}
-      <div className="card fade-in" style={{ animationDelay: "0.15s" }}>
-        <span className="card-title-sm">Ma semaine</span>
-        <div className="week-bars">
-          {days.map((d, i) => {
-            const val = i===6 ? glasses : (weekData[i]||0);
-            const ratio = Math.min(1, val/goal);
-            const today = i===6;
-            return (
-              <div key={d} className="week-col">
-                <div className="bar-track"><div className={`bar-fill ${today?"today":""}`} style={{ height: `${ratio*100}%` }} /></div>
-                <span className={`bar-label ${today?"today":""}`}>{d}</span>
+      {done ? (
+        // ── ÉCRAN TERMINÉ ──
+        <>
+          <button className="breath-back" onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>← Exercices</button>
+          <div style={{ textAlign: 'center', padding: '24px 16px 10px' }} className="fade-in">
+            {img('pouce_v2.png', 'Bravo', { width: 90, height: 90, display: 'block', margin: '0 auto 14px' })}
+            <h3 style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 22, color: '#3a5a40', marginBottom: 8, fontWeight: 700 }}>Belle séance !</h3>
+            <p style={{ fontSize: 13, color: '#5a4a3a', lineHeight: 1.7, marginBottom: 20, fontWeight: 600 }}>
+              Prends le temps de te poser.<br />Ferme les yeux quelques instants si tu veux.<br />Et pense à boire de l'eau 💧
+            </p>
+            <div style={{ color: '#c9a96e', fontWeight: 800, fontSize: 16, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <img src={`${RAW}GALET_SEUL.png`} alt="galet" style={{ width: 22, height: 22, objectFit: 'contain' }} /> +2 galets
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <button className="breath-timer-btn primary" style={{ flex: 1 }}
+                onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>Autre exercice</button>
+              <button className="breath-timer-btn secondary" style={{ flex: 1 }}
+                onClick={() => resetTimerState(duration)}>Recommencer</button>
+            </div>
+            {profil.salleApres && (
+              <div style={{
+                background: 'rgba(255,255,255,0.8)', borderRadius: 14, padding: '14px 16px',
+                border: '1.5px solid rgba(201,169,110,0.2)', textAlign: 'left'
+              }}>
+                <div style={{ fontSize: 11, color: '#9aaa9c', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 4 }}>
+                  Et si tu poussais une autre porte ?
+                </div>
+                <div style={{ fontWeight: 800, fontSize: 15, color: '#1e270c' }}>
+                  {profil.salleApres.emoji} {profil.salleApres.nom}
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════
-// ÉCRAN RELATIONS (placeholder)
-// ═══════════════════════════════════════
-const RelationsPlaceholder = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.couple}</div>
-      <h2 className="title-lg">Mon profil en Relation</h2>
-      <p className="module-desc">Découvre quel profil tu actives avec chaque personne de ton entourage.</p>
-      <div className="phase-badge">⏳ Module profil relationnel v6 à intégrer</div>
-    </div>
-  </div>
-);
-
-// ═══════════════════════════════════════
-// ÉCRAN PROFIL — COMPLET v5
-// ═══════════════════════════════════════
-const ProfileScreen = ({ galets, streak }) => {
-  const [name, setName] = useState("Rachel");
-  const [editing, setEditing] = useState(false);
-  const [mirrorProfile] = useState({ letter: "B", animal: "🐙", name: "Pieuvre", date: "16/02/2026", forceP: "Multi-tâches, Créativité, Vision globale", forceN: "Dispersion, Contrôle, Sur-adaptation" });
-  const [openRelation, setOpenRelation] = useState(null);
-  const [showTestimonial, setShowTestimonial] = useState(null);
-  const [testimonials, setTestimonials] = useState({});
-  const [openCard, setOpenCard] = useState(null);
-  const [showParrainRules, setShowParrainRules] = useState(false);
-
-  return (
-    <div className="screen profil-screen">
-      {/* BOX 1 — MON PROFIL */}
-      <div className="profil-box" style={{ animationDelay: "0.05s" }}>
-        <div className="avatar-zone">
-          <div className="avatar-circle" title="Changer ma photo">
-            {P.meditate}
-            <div className="avatar-edit-hint">📷</div>
+            )}
           </div>
-          {editing ? (
-            <div className="name-edit-row">
-              <input type="text" value={name} onChange={e => setName(e.target.value)} className="p-name-input" autoFocus />
-              <button className="btn-sm" onClick={() => setEditing(false)}>OK</button>
+        </>
+      ) : (
+        // ── ÉCRAN EXERCICE ──
+        <>
+          <button className="breath-back" onClick={() => { clearTimer(); setRunning(false); setPaused(false); goView('profil'); }}>← Exercices</button>
+
+          {/* Titre + badge profil — CORRECTION : badge visible à droite */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 20, fontWeight: 700, color: '#1e270c', flex: 1, paddingRight: 12 }}>
+              {selectedEx.name}
             </div>
-          ) : (
-            <div className="profil-name" onClick={() => setEditing(true)}>
-              {name}<span className="edit-pen">✏️</span>
+            {img(profil.badge, profil.animal, { width: 40, height: 40, flexShrink: 0 })}
+          </div>
+          <div style={{ fontSize: 13, color: '#5b7a5e', fontWeight: 600, lineHeight: 1.4, marginBottom: 16 }}>{selectedEx.subtitle}</div>
+
+          {/* Box zen */}
+          <div style={{ background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '16px 18px', marginBottom: 16, fontSize: 14, color: '#3a3d3b', lineHeight: 1.75, fontWeight: 600, boxShadow: '0 2px 10px rgba(30,39,12,0.04)' }}>
+            {selectedEx.zenTxt}
+          </div>
+
+          {/* Box pratique */}
+          <div style={{ background: 'rgba(255,255,255,0.75)', borderRadius: 14, padding: '14px 16px', marginBottom: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#9aaa9c', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 10 }}>Comment pratiquer</div>
+            {selectedEx.pratique.map((step, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13, color: '#3a3d3b', lineHeight: 1.55 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#468a4d', flexShrink: 0, marginTop: 5 }} />
+                <span>{step}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Zone timer */}
+          <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: 16, padding: '18px 16px 16px', marginBottom: 14 }}>
+            {/* CORRECTION : panda timer centré */}
+            <div style={{ textAlign: 'center', marginBottom: 10 }}>
+              {img('panda_timer.png', 'Panda timer', { width: 68, height: 68, display: 'block', margin: '0 auto' })}
             </div>
-          )}
-          <div className="profil-stats-row">
-            <div className="pstat"><div className="pstat-v gold">{P.galets} {galets}</div><div className="pstat-l">galets</div></div>
-            <div className="pstat-div" />
-            <div className="pstat"><div className="pstat-v orange">🔥 {streak}</div><div className="pstat-l">jours</div></div>
-            <div className="pstat-div" />
-            <div className="pstat"><div className="pstat-v">⭐ {streak + 2}</div><div className="pstat-l">record</div></div>
-          </div>
-        </div>
-      </div>
-
-      {/* BOX 2 — MIROIR DU JOUR */}
-      <div className="profil-box" style={{ animationDelay: "0.1s" }}>
-        <div className="box-header"><div className="box-panda">{P.mirror}</div><div><div className="box-title">Mon Miroir du jour</div><div className="box-subtitle">Découvre quel profil tu actives aujourd'hui</div></div></div>
-        <div className="miroir-result">
-          <div className="miroir-date">📅 {mirrorProfile.date}</div>
-          <div className="miroir-animal">{mirrorProfile.animal}</div>
-          <div className="miroir-name">{mirrorProfile.name}</div>
-          <div className="miroir-letter">Profil {mirrorProfile.letter}</div>
-          <div className="miroir-insight" style={{ marginTop: 14 }}>
-            <div className="miroir-insight-header"><span className="miroir-insight-panda-lg">{P.mirror}</span><div className="miroir-insight-title up">✨ Ce qui te tire vers le haut aujourd'hui</div></div>
-            <div className="miroir-tags">{mirrorProfile.forceP.split(", ").map((f,i) => <span key={`p${i}`} className="tag-plus">✨ {f}</span>)}</div>
-          </div>
-          <div className="miroir-insight" style={{ marginTop: 8 }}>
-            <div className="miroir-insight-header"><span className="miroir-insight-panda-lg">{P.mirrorNeg}</span><div className="miroir-insight-title down">🌒 En stress, attention à...</div></div>
-            <div className="miroir-tags">{mirrorProfile.forceN.split(", ").map((f,i) => <span key={`n${i}`} className="tag-minus">🌒 {f}</span>)}</div>
-          </div>
-        </div>
-        <div className="miroir-btns-5050">
-          <button className="miroir-cta-half">Découvrir<br/>mon Miroir — 3 min</button>
-          <button className="miroir-share-half">{P.envelope} Je partage !</button>
-        </div>
-      </div>
-
-      {/* BOX 3 — RELATIONS */}
-      <div className="profil-box" style={{ animationDelay: "0.15s" }}>
-        <div className="box-header"><div className="box-panda">{P.couple}</div><div><div className="box-title">Mon profil en Relation</div><div className="box-subtitle">{DEMO_RELATIONS.length} relations explorées</div></div></div>
-        {DEMO_RELATIONS.map(r => {
-          const isOpen = openRelation === r.id;
-          const showTest = showTestimonial === r.id;
-          return (
-            <div key={r.id} className="relation-item">
-              <button className="relation-top" onClick={() => setOpenRelation(isOpen ? null : r.id)}>
-                <span className="rel-animal">{r.animal}</span>
-                <div className="rel-info"><div className="rel-label">{r.label}</div><div className="rel-meta">{r.animalName} ({r.profil}) · {r.date}</div></div>
-                {r.complete && <span className="rel-star">⭐</span>}
-                <span className={`rel-arrow ${isOpen?"open":""}`}>›</span>
-              </button>
-              {isOpen && (
-                <div className="relation-detail">
-                  <p>{r.resume}</p>
-                  <div className="tags-row">
-                    {r.forceP.split(", ").map((f,i) => <span key={`p${i}`} className="tag-plus">✨ {f}</span>)}
-                    {r.forceN.split(", ").map((f,i) => <span key={`n${i}`} className="tag-minus">🌒 {f}</span>)}
-                  </div>
-                  <div className="rel-actions">
-                    {r.complete ? (
-                      <button className="rel-btn share" onClick={() => setShowTestimonial(showTest ? null : r.id)}>⭐ Partager mon évolution</button>
-                    ) : (
-                      <button className="rel-btn continue">Continuer la session →</button>
-                    )}
-                  </div>
-                  {showTest && r.complete && (
-                    <div className="testimonial-zone">
-                      <h4>⭐ Mon évolution : Avant → Après</h4>
-                      <textarea className="testimonial-input" placeholder="Qu'est-ce qui a changé pour toi dans cette relation ?" value={testimonials[r.id]||""} onChange={e => setTestimonials({...testimonials,[r.id]:e.target.value})} />
-                      <button className="testimonial-submit">Partager + gagner {P.galets} 1 galet</button>
-                    </div>
+            {!running && !paused ? (
+              <>
+                <div style={{ fontSize: 11, fontWeight: 800, color: '#9aaa9c', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 8, textAlign: 'center' }}>Choisir la durée</div>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                  {[60, 120, 180, 300].map(d => (
+                    <button key={d}
+                      style={{
+                        flex: 1, border: `1.5px solid ${duration === d ? '#468a4d' : 'rgba(70,138,77,0.3)'}`,
+                        background: duration === d ? '#468a4d' : 'rgba(255,255,255,0.7)',
+                        color: duration === d ? 'white' : '#3a5a40',
+                        borderRadius: 10, padding: '9px 4px',
+                        fontFamily: "'Nunito', sans-serif", fontSize: 13, fontWeight: 700, cursor: 'pointer'
+                      }}
+                      onClick={() => { setDuration(d); setTimerLeft(d); setTimerTotal(d); }}>
+                      {d === 60 ? '1 min' : d === 120 ? '2 min' : d === 180 ? '3 min' : '5 min'}
+                    </button>
+                  ))}
+                </div>
+                <button style={{
+                  display: 'block', margin: '0 auto', background: 'transparent', color: '#468a4d',
+                  border: '1.5px solid rgba(70,138,77,0.4)', borderRadius: 12, padding: '10px 28px',
+                  fontFamily: "'Nunito',sans-serif", fontWeight: 700, fontSize: 14, cursor: 'pointer'
+                }} onClick={startTimer}>▶ Démarrer</button>
+              </>
+            ) : (
+              <>
+                <div style={{ background: 'rgba(180,210,240,0.2)', borderRadius: 6, height: 5, overflow: 'hidden', marginBottom: 8 }}>
+                  <div style={{ height: '100%', background: 'linear-gradient(90deg,#5aacdf,#3a8ec4)', borderRadius: 6, width: `${pct}%`, transition: 'width 1s linear' }} />
+                </div>
+                <div style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 28, fontWeight: 700, color: '#8ab8d4', textAlign: 'center', marginBottom: 2 }}>
+                  {fmtTime(timerLeft)}
+                </div>
+                <div style={{ fontSize: 11, color: '#aac8de', fontWeight: 600, textAlign: 'center', marginBottom: 12 }}>
+                  {paused ? 'En pause' : 'En cours...'}
+                </div>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                  {paused ? (
+                    <button className="breath-timer-btn primary" onClick={() => {
+                      setPaused(false); setRunning(true);
+                      intervalRef.current = setInterval(() => {
+                        setTimerLeft(t => {
+                          if (t <= 1) {
+                            clearInterval(intervalRef.current);
+                            setRunning(false); setDone(true); gongEnd();
+                            if (selectedEx && !completedEx[selectedEx.id]) {
+                              setGalets(g => g + 2);
+                              setCompletedEx(prev => ({ ...prev, [selectedEx.id]: true }));
+                            }
+                            return 0;
+                          }
+                          return t - 1;
+                        });
+                      }, 1000);
+                    }}>▶ Reprendre</button>
+                  ) : (
+                    <button className="breath-timer-btn" style={{ background: '#f0ede8', color: '#3a5a40' }}
+                      onClick={() => { clearTimer(); setRunning(false); setPaused(true); }}>⏸ Pause</button>
                   )}
+                  <button className="breath-timer-btn" style={{ background: 'rgba(192,80,60,0.1)', color: '#c0503c' }}
+                    onClick={() => { clearTimer(); setRunning(false); setPaused(false); setTimerLeft(duration); setTimerTotal(duration); }}>
+                    ⏹ Arrêter
+                  </button>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* BOX 4 — CARTES */}
-      <div className="profil-box" style={{ animationDelay: "0.2s" }}>
-        <div className="box-header"><div className="box-panda">{P.cards}</div><div><div className="box-title">Les cartes déjà sorties pour moi</div><div className="box-subtitle">{DEMO_CARTES.length} cartes tirées</div></div></div>
-        {DEMO_CARTES.map(c => {
-          const isOpen = openCard === c.num;
-          return (
-            <div key={c.num}>
-              <div className="carte-item" onClick={() => setOpenCard(isOpen ? null : c.num)}>
-                <div className="carte-dos">{c.num}</div>
-                <div className="carte-phrase"><em><strong>"{c.phrase}"</strong></em></div>
-                <span className={`rel-arrow ${isOpen?"open":""}`}>›</span>
-              </div>
-              {isOpen && (
-                <div className="carte-expand">
-                  <div className="carte-level"><div className="carte-level-name">🌿 Feuille</div><div className="carte-level-text">{c.phrase}</div></div>
-                  <div className="carte-level"><div className="carte-level-name">🎋 Nœud</div><div className="carte-level-text" style={{color:"#6b7c6e",fontStyle:"italic"}}>Lecture approfondie à charger...</div></div>
-                  <div className="carte-level"><div className="carte-level-name">🌱 Racine</div><div className="carte-level-text" style={{color:"#6b7c6e",fontStyle:"italic"}}>Lecture profonde à charger...</div></div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-        <button className="carte-buy-btn">🎴 Bientôt disponible : le jeu complet de 72 cartes en coffret</button>
-      </div>
-
-      {/* BOX 5 — CHEMIN MUDRÂS */}
-      <div className="profil-box" style={{ animationDelay: "0.22s" }}>
-        <div className="box-header-vertical">
-          <div className="box-panda-lg">{P.mudra}</div>
-          <div className="box-title">Mon chemin Mudrâs</div>
-          <div className="box-subtitle">73 pas · 18 mudrâs · Un chemin vers soi.</div>
-        </div>
-        <div className="path-container">
-          <div className="stepping-stones">
-            {Array.from({ length: 73 }, (_, i) => {
-              const day = i + 1;
-              const mudra = MUDRAS_PALIERS.find(m => m.day === day);
-              const walked = day <= streak;
-              const isCurrent = day === streak + 1;
-              const status = walked ? "walked" : isCurrent ? "current" : "upcoming";
-              if (mudra) {
-                return (<div key={day} className={`stone mudra-stone ${status} ${mudra.special?"special":""} ${mudra.final?"final":""}`} title={`Jour ${day} — Mudrâ ${mudra.num}`}>{walked ? "🙏" : mudra.final ? "🌟" : mudra.num}</div>);
-              }
-              return (<div key={day} className={`stone ${status}`} title={`Jour ${day}`}>{walked ? "·" : ""}</div>);
-            })}
+              </>
+            )}
           </div>
-          <div className="path-legend">
-            <div className="legend-item"><div className="legend-dot green" /> Parcouru</div>
-            <div className="legend-item"><div className="legend-dot gold" /> Aujourd'hui</div>
-            <div className="legend-item"><div className="legend-dot gray" /> À venir</div>
+
+          {(running || paused) && (
+            <button style={{
+              width: '100%', background: 'transparent', border: '1.5px solid rgba(70,138,77,0.3)',
+              borderRadius: 12, padding: 11, fontFamily: "'Nunito',sans-serif", fontWeight: 700,
+              fontSize: 13, color: '#468a4d', cursor: 'pointer', marginBottom: 10
+            }} onClick={() => resetTimerState(duration)}>↻ Recommencer tout l'exercice</button>
+          )}
+
+          {/* Box conseils */}
+          <div style={{ background: 'rgba(255,255,255,0.75)', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: '#9aaa9c', letterSpacing: '0.6px', textTransform: 'uppercase', marginBottom: 12 }}>Conseils de pratique</div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13, color: '#3a3d3b', lineHeight: 1.5 }}>🔄 <span><strong>Répétitions :</strong> {selectedEx.reps}</span></div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13, color: '#3a3d3b', lineHeight: 1.5 }}>⏱️ <span><strong>Durée idéale :</strong> {selectedEx.duration}</span></div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 13, color: '#3a3d3b', lineHeight: 1.5 }}>🧘 <span><strong>Position :</strong> {selectedEx.position}</span></div>
+            <div style={{ display: 'flex', gap: 10, fontSize: 13, color: '#3a3d3b', lineHeight: 1.5 }}>💡 <span><strong>Astuce :</strong> {selectedEx.astuces}</span></div>
           </div>
-        </div>
-        <div className="path-progress">
-          <div className="progress-bar-track"><div className="progress-bar-fill" style={{ width: `${Math.round((streak/73)*100)}%` }} /></div>
-          <div className="path-stats">
-            <div className="path-stat"><div className="path-stat-v">{streak}/73</div><div className="path-stat-l">jours</div></div>
-            <div className="path-stat"><div className="path-stat-v">{MUDRAS_PALIERS.filter(m => streak >= m.day).length}/18</div><div className="path-stat-l">mudrâs reçus</div></div>
-            <div className="path-stat"><div className="path-stat-v">{P.galets} {streak}</div><div className="path-stat-l">galets du chemin</div></div>
-          </div>
-        </div>
-        <div className="path-galet-hint">{P.galets} +1 galet pour chaque jour de pratique entre deux mudrâs</div>
-        <button className="path-cta-violet">Voir mes mudrâs reçus</button>
-      </div>
 
-      {/* BOX 6 — GALETS */}
-      <div className="profil-box" style={{ animationDelay: "0.25s" }}>
-        <div className="box-header"><div className="box-panda">{P.galets}</div><div><div className="box-title">Mes galets gagnés</div><div className="box-subtitle">Construis ton équilibre, galet par galet</div></div></div>
-        <div className="galets-summary"><div className="galets-big">{galets}</div><div className="galets-label">galets au total</div></div>
-        <div className="galets-grid">
-          <div className="galet-item"><div className="galet-item-val">+2</div><div className="galet-item-label">RESPIRATION</div></div>
-          <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">CARTE VITA</div></div>
-          <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">HYDRATATION</div></div>
-          <div className="galet-item"><div className="galet-item-val">+5</div><div className="galet-item-label">MIROIR</div></div>
-          <div className="galet-item"><div className="galet-item-val">+3</div><div className="galet-item-label">PANDA RELAX</div></div>
-          <div className="galet-item"><div className="galet-item-val">+1</div><div className="galet-item-label">TÉMOIGNAGE</div></div>
-        </div>
-        <button className="galets-earn-btn">
-          <div className="galets-earn-panda pulse">{P.pandaGalet}</div>
-          <div className="galets-earn-text">Clique pour gagner encore des galets aujourd'hui !</div>
-        </button>
-        <div className="galets-explain">💡 Tes galets symbolisent ton engagement envers toi-même. Chaque action compte. Invite tes proches pour en gagner davantage !</div>
-      </div>
+          {/* Source */}
+          <details style={{ marginBottom: 16 }}>
+            <summary style={{ fontSize: 11, color: '#468a4d', fontWeight: 700, cursor: 'pointer', padding: '8px 0' }}>📚 Source scientifique</summary>
+            <p style={{ fontSize: 11, color: '#888', lineHeight: 1.6, paddingTop: 8, borderTop: '1px solid rgba(154,170,156,0.15)' }}>{selectedEx.source}</p>
+          </details>
+        </>
+      )}
+    </div>
+  );
 
-      {/* BOX 7 — PARRAINAGE */}
-      <div className="profil-box" style={{ animationDelay: "0.3s" }}>
-        <div className="box-header"><div className="box-panda">{P.envelope}</div><div><div className="box-title">Parrainage</div><div className="box-subtitle">Invite tes proches, gagne des galets !</div></div></div>
-        <div className="parrain-stats">
-          <div className="parrain-stat"><div className="parrain-v">{DEMO_FILLEULS.length}</div><div className="parrain-l">filleuls</div></div>
-          <div className="parrain-stat"><div className="parrain-v gold">{P.galets} {DEMO_FILLEULS.reduce((s,f) => s+f.galets,0)}</div><div className="parrain-l">galets gagnés</div></div>
-        </div>
-        <div className="parrain-rules">
-          <div className="parrain-rules-title" onClick={() => setShowParrainRules(!showParrainRules)}>{showParrainRules ? "▼" : "▶"} Comment ça marche ?</div>
-          {showParrainRules && (<>
-            <div className="parrain-rule"><span className="rule-galets">+1</span><span className="rule-text">Ton filleul s'inscrit en version gratuite</span></div>
-            <div className="parrain-rule"><span className="rule-galets">+2</span><span className="rule-text">Ton filleul passe à l'abonnement Premium</span></div>
-          </>)}
-        </div>
-        {DEMO_FILLEULS.map((f,i) => (
-          <div key={i} className="filleul-item">
-            <span style={{fontSize:18}}>👤</span>
-            <span className="filleul-name">{f.name}</span>
-            <span className="filleul-date">{f.date}</span>
-            <span className={`filleul-badge ${f.type}`}>{P.galets} +{f.type==="payant"?"2":"1"}</span>
-          </div>
-        ))}
-        <button className="share-btn">✉️ Inviter un ami</button>
-      </div>
-
-      {/* BOX BONUS */}
-      <div className="profil-box bonus-box" style={{ animationDelay: "0.35s" }}>
-        <div className="box-header"><div className="box-panda" style={{fontSize:32}}>⭐</div><div><div className="box-title">Bonus</div><div className="box-subtitle">Ressources, contact & partenariats</div></div></div>
-        <div className="bonus-links">
-          <button className="bonus-link-btn"><span className="bonus-icon">📩</span> Nous contacter</button>
-          <button className="bonus-link-btn"><span className="bonus-icon">🛒</span> Commander les cartes VITA®</button>
-          <button className="bonus-link-btn"><span className="bonus-icon">🤝</span> Partenariats <span className="bonus-soon">(bientôt disponible)</span></button>
-          <button className="bonus-link-btn"><span className="bonus-icon">📰</span> Actualités Centre VITA</button>
-        </div>
-      </div>
-
-      {/* RÉGLAGES */}
-      <h3 className="section-title-profil">⚙️ Réglages</h3>
-      <div className="menu-box" style={{ animationDelay: "0.35s" }}>
-        {[
-          { i: "🔔", l: "Notifications & rappels" },
-          { i: "🌍", l: "Langue", v: "Français · English (bientôt)" },
-          { i: "🕐", l: "Fuseau horaire", v: "UTC-4 (Martinique)" },
-          { i: "📝", l: "Abonnement", v: "Early 2,99€/mois" },
-          { i: "📋", l: "CGU / CGV" },
-          { i: "🔒", l: "Confidentialité" },
-          { i: "🚪", l: "Déconnexion", danger: true },
-        ].map((m,i) => (
-          <button key={i} className="menu-item">
-            <span className="menu-i">{m.i}</span>
-            <span className={`menu-l ${m.danger?"danger":""}`}>{m.l}</span>
-            {m.v && <span className="menu-v">{m.v}</span>}
-            <span className="menu-arrow">›</span>
-          </button>
-        ))}
+  // FIX page blanche : si état incohérent, retour welcome
+  return (
+    <div className="screen" style={{ position: 'relative' }}>
+      <MusicBtn music={music} />
+      <button className="breath-back" onClick={() => setView('welcome')}>← Retour</button>
+      <div style={{ textAlign: 'center', padding: '40px 20px', color: '#9aaa9c' }}>
+        Chargement...
       </div>
     </div>
   );
 };
 
-// ═══════════════════════════════════════
-// SPLASH SCREEN (style Duolingo)
-// ═══════════════════════════════════════
-const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState(0); // 0=panda, 1=titre, 2=fade-out
-  const doneRef = useRef(false);
-  const finish = () => { if (!doneRef.current) { doneRef.current = true; onDone(); } };
-  useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 2000);
-    const t2 = setTimeout(() => setPhase(2), 4000);
-    const t3 = setTimeout(finish, 4600);
-    // Fallback de sécurité — si rien ne se passe après 6s, on ferme quand même
-    const safety = setTimeout(finish, 6000);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(safety); };
-  }, []);
-  return (
-    <div className={`splash-screen ${phase >= 2 ? "fade-out" : ""}`} onClick={finish}>
-      <div className={`splash-phase1 ${phase >= 1 ? "hide" : ""}`}>
-        <div className="splash-panda">{P.original}</div>
-      </div>
-      <div className={`splash-phase2 ${phase >= 1 && phase < 2 ? "show" : ""}`}>
-        <div className="splash-panda-small">{P.original}</div>
-        <div className="splash-title">PANDA ZEN</div>
-        <div className="splash-sub">Mieux te comprendre, chaque jour.</div>
-        <div className="splash-credit">Centre VITA®</div>
-      </div>
-    </div>
-  );
-};
-
-// ═══════════════════════════════════════
-// APP PRINCIPALE
-// ═══════════════════════════════════════
-export default function PandaZenApp() {
-  const [tab, setTab] = useState(0);
-  const [galets, setGalets] = useState(12);
-  const [streak] = useState(3);
-  const [showSplash, setShowSplash] = useState(true);
-
-  const goTab = (t) => { setTab(t); window.scrollTo(0, 0); };
-
-  const tabs = [
-    { id: "home", label: "Accueil", icon: P.bambou },
-    { id: "breathe", label: "Respirer", icon: P.breathe },
-    { id: "card", label: "Carte", icon: P.cards },
-    { id: "relax", label: "Relax", icon: P.relax },
-    { id: "water", label: "Eau", icon: P.water },
-    { id: "relations", label: "Relations", icon: P.couple },
-    { id: "profile", label: "_hidden_", icon: null },
-  ];
-
-  const screens = [
-    <HomeScreen galets={galets} streak={streak} onNav={goTab} />,
-    <BreathScreen />,
-    <CardScreen />,
-    <RelaxScreen />,
-    <WaterScreen galets={galets} setGalets={setGalets} />,
-    <RelationsPlaceholder />,
-    <ProfileScreen galets={galets} streak={streak} />,
-  ];
-
-  return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* ═══ APP SHELL ═══ */
-        .panda-icon {
-          display: inline-block;
-          object-fit: contain;
-          vertical-align: middle;
-        }
-        /* Tailles par contexte — agrandies */
-        .header-panda .panda-icon { width: 38px; height: 38px; }
-        .home-hero-panda .panda-icon { width: 80px; height: 80px; }
-        .home-stat-icon .panda-icon { width: 28px; height: 28px; }
-        .home-action-panda .panda-icon { width: 54px; height: 54px; }
-        .home-galet-badge .panda-icon { width: 18px; height: 18px; }
-        .galet-inline .panda-icon { width: 18px; height: 18px; }
-        .module-panda .panda-icon { width: 100px; height: 100px; }
-        .module-panda.big .panda-icon { width: 120px; height: 120px; }
-        .water-panda .panda-icon { width: 60px; height: 60px; }
-        .box-panda .panda-icon { width: 50px; height: 50px; }
-        .miroir-animal .panda-icon { width: 56px; height: 56px; }
-        .miroir-insight-panda .panda-icon { width: 34px; height: 34px; }
-        .avatar-circle .panda-icon { width: 52px; height: 52px; }
-        .nav-emoji .panda-icon { width: 26px; height: 26px; }
-        .miroir-cta-panda .panda-icon { width: 64px; height: 64px; }
-        .galets-big .panda-icon { width: 36px; height: 36px; }
-        .pstat-v .panda-icon { width: 18px; height: 18px; }
-        .parrain-v .panda-icon { width: 18px; height: 18px; }
-        .filleul-badge .panda-icon { width: 14px; height: 14px; }
-        .splash-panda .panda-icon { width: 160px; height: 160px; }
-        .splash-panda-small .panda-icon { width: 80px; height: 80px; }
-        .miroir-share .panda-icon { width: 20px; height: 20px; }
-        .galets-earn-panda .panda-icon { width: 80px; height: 80px; }
-        .path-galet-hint .panda-icon { width: 16px; height: 16px; }
-        .path-stat-v .panda-icon { width: 16px; height: 16px; }
-
-        /* ═══ SPLASH SCREEN 2 PHASES (Duolingo style) ═══ */
-        .splash-screen {
-          position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
-          background: #3a5a40;
-          display: flex; align-items: center; justify-content: center;
-          transition: opacity 0.6s ease;
-        }
-        .splash-screen.fade-out { opacity: 0; pointer-events: none; }
-        .splash-phase1 {
-          position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-        .splash-phase1.hide { opacity: 0; transform: scale(0.8); }
-        .splash-panda { animation: splashBounce 0.8s ease 0.2s both; filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3)); }
-        .splash-phase2 {
-          position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-          opacity: 0; transform: translateY(20px);
-        }
-        .splash-phase2.show { opacity: 1; transform: translateY(0); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .splash-panda-small { filter: drop-shadow(0 3px 12px rgba(0,0,0,0.2)); }
-        .splash-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 38px; color: #ffffff; margin-top: 16px; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .splash-sub { font-size: 15px; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 600; }
-        .splash-credit { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 24px; }
-        @keyframes splashBounce { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* ═══ MIROIR CTA HOME (fond blanc, bord doré) ═══ */
-        .miroir-cta-home {
-          width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;
-          background: white;
-          border: 2.5px solid #c9a96e;
-          border-radius: 20px; padding: 20px 16px 16px;
-          margin-bottom: 20px; cursor: pointer;
-          box-shadow: 0 4px 20px rgba(201,169,110,0.15);
-          text-align: center; font-family: 'Nunito', sans-serif;
-          transition: transform 0.2s, box-shadow 0.2s;
-          animation: slideUp 0.5s ease 0.15s both;
-        }
-        .miroir-cta-home:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(201,169,110,0.25); }
-        .miroir-cta-home:active { transform: scale(0.98); }
-        .miroir-cta-panda { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1)); }
-        .miroir-cta-title { font-weight: 800; font-size: 18px; color: #1e270c; }
-        .miroir-cta-desc { font-size: 13px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
-        .miroir-cta-badge { background: #f5eedd; border: 1.5px solid #d4b87a; border-radius: 20px; padding: 4px 12px; font-weight: 700; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .miroir-cta-btn { margin-top: 8px; background: #3a5a40; color: white; border: none; border-radius: 12px; padding: 10px 32px; font-weight: 800; font-size: 14px; letter-spacing: 0.3px; }
-        .app-shell {
-          max-width: 430px; margin: 0 auto; min-height: 100vh;
-          background: linear-gradient(180deg, #f5f0eb 0%, #f0ede8 40%, #e8f0e4 100%);
-          font-family: 'Nunito', sans-serif; color: #2d2f2e;
-          position: relative; overflow-x: hidden;
-        }
-
-        /* ═══ HEADER ═══ */
-        .app-header {
-          position: sticky; top: 0; z-index: 100;
-          background: rgba(245,240,235,0.92);
-          backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-          padding: 10px 16px;
-          display: flex; align-items: center; justify-content: space-between;
-          border-bottom: 1px solid rgba(154,170,156,0.1);
-        }
-        .header-logo { display: flex; align-items: center; gap: 10px; }
-        .header-panda { font-size: 32px; line-height: 1; }
-        .header-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 21px; color: #1e270c; letter-spacing: 0.4px; }
-        .header-avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(91,122,94,0.4); background: linear-gradient(135deg,#e8f0e4,#f5f0eb); font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 8px rgba(30,39,12,0.1); }
-        .header-avatar:hover { transform: scale(1.1); box-shadow: 0 3px 12px rgba(30,39,12,0.15); }
-        .header-avatar:active { transform: scale(0.95); }
-
-        /* ═══ SCREENS ═══ */
-        .screen { padding: 20px 16px 20px; }
-        .center-screen { text-align: center; }
-
-        /* ═══ TYPOGRAPHY ═══ */
-        .title-lg { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 24px; color: #1e270c; }
-        .section-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 18px; color: #1e270c; margin-bottom: 14px; }
-        .tagline-sm { font-size: 15px; color: #3a5a40; margin-top: 4px; line-height: 1.4; font-weight: 600; }
-
-        /* ═══ HOME v2 ═══ */
-        .home-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; animation: slideUp 0.5s ease both; }
-        .home-hero-panda { font-size: 60px; line-height: 1; }
-        .home-greeting { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 26px; color: #1e270c; }
-        .home-tagline { font-size: 15px; font-weight: 700; color: #3a3d3b; margin-top: 4px; line-height: 1.4; }
-        .home-stats { display: flex; gap: 12px; margin-bottom: 24px; animation: slideUp 0.5s ease 0.1s both; }
-        .home-stat-card { flex: 1; background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 12px rgba(30,39,12,0.06); text-align: center; }
-        .home-stat-icon { font-size: 22px; margin-bottom: 4px; }
-        .home-stat-val { font-weight: 800; font-size: 28px; }
-        .home-stat-val.gold { color: #c9a96e; }
-        .home-stat-val.orange { color: #d4845a; }
-        .home-stat-label { font-size: 13px; color: #2d3a2e; margin-top: 2px; font-weight: 700; }
-        .home-section-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 20px; color: #1e270c; margin-bottom: 14px; }
-        .home-action { width: 100%; display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.93); border: none; border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(30,39,12,0.05); text-align: left; font-family: 'Nunito', sans-serif; transition: transform 0.2s, box-shadow 0.2s; animation: slideUp 0.4s ease both; }
-        .home-action:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(30,39,12,0.1); }
-        .home-action:active { transform: scale(0.98); }
-        .home-action-panda { font-size: 40px; line-height: 1; }
-        .home-action-text { flex: 1; }
-        .home-action-title { font-weight: 800; font-size: 16px; color: #1e270c; }
-        .home-action-desc { font-size: 13px; color: #2d3a2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
-        .home-galet-badge { background: #f5f0eb; border: 1.5px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
-
-        /* ═══ CARDS GENERIC ═══ */
-        .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-title-sm { font-weight: 800; font-size: 15px; color: #1e270c; margin-bottom: 10px; }
-        .link-btn { background: none; border: none; color: #5b7a5e; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
-
-        /* ═══ MODULE PLACEHOLDER ═══ */
-        .module-card { background: rgba(255,255,255,0.93); border-radius: 24px; padding: 40px 24px; box-shadow: 0 4px 20px rgba(30,39,12,0.07); }
-        .module-panda { font-size: 80px; line-height: 1; margin-bottom: 16px; }
-        .module-panda.big { font-size: 100px; }
-        .module-desc { font-size: 15px; color: #2d3a2e; line-height: 1.6; margin: 10px 0 20px; font-weight: 600; }
-        .phase-badge { background: rgba(91,122,94,0.08); border-radius: 12px; padding: 14px 18px; font-size: 13px; color: #5b7a5e; font-weight: 600; }
-
-        /* ═══ WATER ═══ */
-        .water-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; animation: slideUp 0.4s ease both; }
-        .water-panda { font-size: 48px; line-height: 1; }
-        .water-main { background: rgba(255,255,255,0.93); border-radius: 24px; padding: 28px 20px; box-shadow: 0 4px 20px rgba(30,39,12,0.07); text-align: center; margin-bottom: 14px; }
-        .water-info-toggle { display: block; width: 100%; background: none; border: none; font-family: 'Nunito'; font-size: 13px; font-weight: 700; color: #3a7a94; cursor: pointer; text-align: left; padding: 6px 0; margin-bottom: 10px; }
-        .water-info-text { background: rgba(74,143,168,0.08); border-radius: 12px; padding: 14px; font-size: 13px; color: #2d3a2e; line-height: 1.6; font-weight: 600; margin-bottom: 14px; }
-        .circle-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
-        .circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .circle-bg { fill: none; stroke: rgba(107,163,190,0.2); stroke-width: 12; }
-        .circle-fill { fill: none; stroke: #4a8fa8; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
-        .circle-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
-        .circle-num { font-weight: 800; font-size: 36px; color: #4a8fa8; }
-        .circle-label { font-size: 13px; color: #6b7c6e; }
-        .water-btns { display: flex; justify-content: center; gap: 16px; align-items: center; }
-        .water-minus { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #9aaa9c; background: transparent; font-size: 22px; color: #6b7c6e; cursor: pointer; font-family: 'Nunito'; font-weight: 700; transition: background 0.2s; }
-        .water-minus:hover { background: rgba(154,170,156,0.1); }
-        .water-plus { width: 72px; height: 72px; border-radius: 50%; border: none; background: linear-gradient(135deg,#6ba3be,#4a8fa8); font-size: 28px; color: white; cursor: pointer; font-family: 'Nunito'; font-weight: 700; box-shadow: 0 4px 16px rgba(107,163,190,0.35); transition: transform 0.15s, box-shadow 0.15s; }
-        .water-plus:hover { transform: scale(1.05); }
-        .water-plus:active { transform: scale(0.95); }
-        .goal-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-        .goal-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid #9aaa9c; background: transparent; font-family: 'Nunito'; font-size: 14px; color: #2d2f2e; cursor: pointer; transition: all 0.15s; }
-        .goal-btn.active { border: 2px solid #34490a; background: rgba(52,73,10,0.08); font-weight: 700; color: #34490a; }
-        .goal-btn:hover { background: rgba(52,73,10,0.05); }
-        .water-goal-card { padding-bottom: 20px; }
-        .water-galet-rewards { margin-top: 16px; border-top: 1px solid rgba(154,170,156,0.15); padding-top: 14px; }
-        .water-reward-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; }
-        .water-reward-row.earned { background: rgba(91,122,94,0.08); }
-        .water-reward-label { font-weight: 700; font-size: 14px; color: #2d3a2e; }
-        .water-reward-val { display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 14px; color: #c9a96e; }
-        .water-check { color: #3a5a40; font-weight: 800; font-size: 16px; }
-        .water-module-cta { display: block; width: 100%; background: white; border: 2px solid #4a8fa8; border-radius: 16px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; color: #3a7a94; cursor: pointer; text-align: center; margin-bottom: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 10px rgba(74,143,168,0.1); animation: waterPulse 2.5s ease-in-out infinite; }
-        .water-module-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(74,143,168,0.2); animation: none; }
-        .water-module-cta:active { transform: scale(0.98); animation: none; }
-        @keyframes waterPulse { 0%,100% { box-shadow: 0 2px 10px rgba(74,143,168,0.1); } 50% { box-shadow: 0 2px 20px rgba(74,143,168,0.35); border-color: #3a7a94; } }
-        .water-reminder-desc { font-size: 13px; color: #2d3a2e; font-weight: 600; line-height: 1.5; margin-bottom: 12px; }
-        .water-reminder-config { background: rgba(74,143,168,0.06); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-        .reminder-row { display: flex; align-items: center; gap: 10px; justify-content: center; }
-        .reminder-label { font-weight: 700; font-size: 14px; color: #2d3a2e; }
-        .reminder-select { padding: 8px 12px; border: 1.5px solid #4a8fa8; border-radius: 10px; font-family: 'Nunito'; font-size: 14px; font-weight: 700; color: #3a7a94; background: white; cursor: pointer; }
-        .reminder-calc { text-align: center; margin-top: 8px; font-size: 13px; font-weight: 700; color: #4a8fa8; }
-        .water-reminder-btn { display: block; width: 100%; background: linear-gradient(135deg, #4a8fa8, #3a7a94); color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 3px 12px rgba(74,143,168,0.3); transition: transform 0.15s, box-shadow 0.15s; }
-        .water-reminder-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(74,143,168,0.4); }
-        .water-reminder-btn:active { transform: scale(0.98); }
-        .reminder-note { font-size: 11px; color: #6b7c6e; text-align: center; margin-top: 8px; font-style: italic; }
-        .week-bars { display: flex; justify-content: space-between; margin-top: 14px; }
-        .week-col { text-align: center; flex: 1; }
-        .bar-track { width: 28px; height: 56px; background: rgba(107,163,190,0.15); border-radius: 14px; margin: 0 auto 6px; position: relative; overflow: hidden; }
-        .bar-fill { position: absolute; bottom: 0; width: 100%; background: rgba(74,143,168,0.6); border-radius: 14px; transition: height 0.4s ease; }
-        .bar-fill.today { background: #3a7a94; }
-        .bar-label { font-size: 12px; color: #3a5a40; font-weight: 600; }
-        .bar-label.today { color: #3a7a94; font-weight: 800; }
-
-        /* ═══ PROFIL v5 ═══ */
-        .profil-screen { padding-top: 10px; }
-        .profil-box { background: rgba(255,255,255,0.93); border-radius: 20px; margin-bottom: 14px; padding: 20px; box-shadow: 0 2px 14px rgba(30,39,12,0.06); animation: slideUp 0.4s ease both; }
-        .box-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-        .box-panda { font-size: 40px; line-height: 1; }
-        .box-title { font-family: 'Josefin Sans'; font-weight: 700; font-size: 18px; color: #1e270c; }
-        .box-subtitle { font-size: 13px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
-        .avatar-zone { display: flex; flex-direction: column; align-items: center; }
-        .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#e8f0e4,#f5f0eb); border: 3px solid rgba(91,122,94,0.2); display: flex; align-items: center; justify-content: center; font-size: 44px; margin-bottom: 10px; cursor: pointer; position: relative; transition: transform 0.2s; }
-        .avatar-circle:hover { transform: scale(1.05); }
-        .avatar-edit-hint { position: absolute; bottom: -2px; right: -2px; background: #34490a; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .profil-name { font-family: 'Josefin Sans'; font-weight: 700; font-size: 22px; color: #1e270c; cursor: pointer; margin-bottom: 4px; }
-        .edit-pen { font-size: 14px; color: #9aaa9c; margin-left: 4px; }
-        .name-edit-row { display: flex; gap: 8px; justify-content: center; margin: 6px 0; }
-        .p-name-input { font-family: 'Josefin Sans'; font-weight: 700; font-size: 18px; color: #1e270c; border: 2px solid #5b7a5e; border-radius: 12px; padding: 6px 14px; text-align: center; background: #f5f0eb; outline: none; width: 140px; }
-        .btn-sm { background: #34490a; color: white; border: none; border-radius: 10px; padding: 8px 14px; font-family: 'Nunito'; font-weight: 700; font-size: 13px; cursor: pointer; }
-        .profil-stats-row { display: flex; justify-content: center; gap: 20px; margin-top: 14px; align-items: center; }
-        .pstat { text-align: center; }
-        .pstat-v { font-weight: 800; font-size: 18px; }
-        .pstat-v.gold { color: #c9a96e; }
-        .pstat-v.orange { color: #d4845a; }
-        .pstat-l { font-size: 12px; color: #3a5a40; font-weight: 600; }
-        .pstat-div { width: 1px; height: 28px; background: rgba(154,170,156,0.2); }
-
-        /* MIROIR */
-        .miroir-result { background: linear-gradient(135deg,#f5f0eb,#e8f0e4); border-radius: 16px; padding: 20px; text-align: center; }
-        .miroir-date { font-size: 12px; color: #6b7c6e; margin-bottom: 8px; font-weight: 600; }
-        .miroir-animal { font-size: 48px; margin-bottom: 6px; }
-        .miroir-name { font-family: 'Josefin Sans'; font-weight: 700; font-size: 20px; color: #1e270c; }
-        .miroir-letter { font-size: 13px; color: #6b7c6e; margin-top: 2px; }
-        .miroir-insight { margin-top: 14px; padding: 14px; background: rgba(255,255,255,0.7); border-radius: 12px; text-align: left; font-size: 14px; line-height: 1.6; color: #2d2f2e; font-weight: 600; }
-        .miroir-insight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .miroir-insight-panda { font-size: 28px; line-height: 1; }
-        .miroir-insight-title { font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .miroir-insight-title.up { color: #3a5a40; }
-        .miroir-insight-title.down { color: #a0604a; }
-        .miroir-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .tag-plus { flex: 1; min-width: calc(50% - 4px); background: rgba(91,122,94,0.12); color: #3a5a40; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
-        .tag-minus { flex: 1; min-width: calc(50% - 4px); background: rgba(192,120,90,0.12); color: #a0604a; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
-        .miroir-btns { display: flex; gap: 8px; margin-top: 16px; }
-        .miroir-cta { flex: 1; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
-        .miroir-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(52,73,10,0.2); }
-        .miroir-cta:active { transform: scale(0.98); }
-        .miroir-share { width: 48px; background: linear-gradient(135deg,#c9a96e,#b89860); color: white; border: none; border-radius: 14px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; box-shadow: 0 2px 8px rgba(201,169,110,0.3); }
-        .miroir-share:hover { transform: translateY(-1px); }
-
-        /* RELATIONS */
-        .relation-item { border-bottom: 1px solid rgba(154,170,156,0.1); padding: 12px 0; }
-        .relation-item:last-child { border-bottom: none; }
-        .relation-top { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; background: none; border: none; font-family: 'Nunito'; text-align: left; padding: 0; }
-        .relation-top:hover { opacity: 0.85; }
-        .rel-animal { font-size: 28px; }
-        .rel-info { flex: 1; }
-        .rel-label { font-weight: 800; font-size: 16px; color: #1e270c; }
-        .rel-meta { font-size: 13px; color: #3a5a40; font-weight: 600; margin-top: 2px; }
-        .rel-star { font-size: 18px; }
-        .rel-arrow { font-size: 14px; color: #9aaa9c; transition: transform 0.2s; }
-        .rel-arrow.open { transform: rotate(90deg); }
-        .relation-detail { margin-top: 10px; padding: 16px; background: rgba(245,240,235,0.6); border-radius: 12px; font-size: 13px; color: #2d2f2e; line-height: 1.7; }
-        .relation-detail .tags-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
-        .rel-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .rel-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Nunito'; font-weight: 600; font-size: 12px; cursor: pointer; transition: transform 0.15s; }
-        .rel-btn:active { transform: scale(0.96); }
-        .rel-btn.continue { background: #34490a; color: white; }
-        .rel-btn.share { background: rgba(91,122,94,0.12); color: #3a5a40; }
-        .testimonial-zone { margin-top: 10px; padding: 12px; background: rgba(201,169,110,0.08); border-radius: 12px; }
-        .testimonial-zone h4 { font-size: 13px; font-weight: 700; color: #c9a96e; margin-bottom: 8px; }
-        .testimonial-input { width: 100%; border: 1px solid rgba(154,170,156,0.3); border-radius: 10px; padding: 10px; font-family: 'Nunito'; font-size: 13px; resize: vertical; min-height: 60px; background: white; outline: none; }
-        .testimonial-input:focus { border-color: #5b7a5e; }
-        .testimonial-submit { margin-top: 8px; background: #c9a96e; color: white; border: none; border-radius: 10px; padding: 8px 16px; font-family: 'Nunito'; font-weight: 700; font-size: 12px; cursor: pointer; }
-
-        /* CARTES */
-        .carte-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(154,170,156,0.1); cursor: pointer; }
-        .carte-item:last-child { border-bottom: none; }
-        .carte-item:hover { opacity: 0.85; }
-        .carte-dos { width: 40px; height: 54px; border-radius: 8px; background: linear-gradient(135deg,#a8d8ea,#82c4d8); border: 2px solid #5ba0b5; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Josefin Sans'; font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(91,160,181,0.25); flex-shrink: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .carte-phrase { flex: 1; font-size: 13px; color: #2d2f2e; line-height: 1.4; font-style: italic; }
-        .carte-expand { padding: 12px; margin: 4px 0 8px; background: rgba(245,240,235,0.6); border-radius: 12px; }
-        .carte-level { margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid rgba(154,170,156,0.08); }
-        .carte-level:last-child { border-bottom: none; }
-        .carte-level-name { font-weight: 700; font-size: 12px; color: #5b7a5e; margin-bottom: 4px; }
-        .carte-level-text { font-size: 13px; line-height: 1.5; }
-        .carte-buy-btn { display: block; width: 100%; margin-top: 14px; background: rgba(168,216,234,0.15); border: 2px solid #82c4d8; color: #4a8fa8; border-radius: 14px; padding: 12px; font-family: 'Nunito'; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; transition: background 0.15s; }
-        .carte-buy-btn:hover { background: rgba(168,216,234,0.25); }
-
-        /* CHEMIN MUDRÂS */
-        .path-container { position: relative; padding: 14px 10px; background: rgba(107,163,190,0.12); border-radius: 14px; }
-        .stepping-stones { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 0; }
-        .stone { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; transition: all 0.3s ease; }
-        .stone.walked { background: linear-gradient(135deg,#5b7a5e,#3a5a40); color: white; box-shadow: 0 2px 6px rgba(58,90,64,0.3); }
-        .stone.current { background: linear-gradient(135deg,#c9a96e,#b89860); color: white; box-shadow: 0 2px 8px rgba(201,169,110,0.4); animation: pulse 2s ease infinite; }
-        .stone.upcoming { background: rgba(154,170,156,0.15); color: #9aaa9c; }
-        .stone.mudra-stone { width: 38px; height: 38px; font-size: 16px; border: 2px solid; }
-        .stone.mudra-stone.walked { border-color: #3a5a40; }
-        .stone.mudra-stone.current { border-color: #c9a96e; }
-        .stone.mudra-stone.upcoming { border-color: rgba(154,170,156,0.2); }
-        .stone.mudra-stone.special { border-color: #5a5aa0; }
-        .stone.mudra-stone.special.walked { background: linear-gradient(135deg,#5a5aa0,#7a6ab0); box-shadow: 0 2px 8px rgba(90,90,160,0.35); }
-        .stone.mudra-stone.final { border-color: #3a2a6e; border-width: 2px; }
-        .stone.mudra-stone.final.upcoming { background: rgba(90,90,160,0.35); }
-        .path-legend { display: flex; gap: 14px; justify-content: center; margin-top: 10px; font-size: 10px; color: #6b7c6e; }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .legend-dot.green { background: #3a5a40; }
-        .legend-dot.gold { background: #c9a96e; }
-        .legend-dot.gray { background: rgba(154,170,156,0.3); }
-        .path-progress { margin-top: 14px; text-align: center; }
-        .progress-bar-track { height: 6px; background: rgba(154,170,156,0.15); border-radius: 3px; margin: 8px 0; }
-        .progress-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#5b7a5e,#c9a96e); transition: width 0.6s ease; }
-        .path-stats { display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
-        .path-stat { text-align: center; }
-        .path-stat-v { font-weight: 800; font-size: 16px; color: #3a5a40; display: flex; align-items: center; gap: 4px; }
-        .path-stat-l { font-size: 11px; color: #3a5a40; font-weight: 600; }
-        .path-cta { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s; }
-        .path-cta:hover { transform: translateY(-1px); }
-        .path-cta:active { transform: scale(0.98); }
-        .path-galet-hint { margin-top: 10px; padding: 12px; background: rgba(201,169,110,0.1); border-radius: 10px; font-size: 13px; color: #3a5a40; text-align: center; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .path-credit { margin-top: 10px; font-size: 11px; color: #9aaa9c; text-align: center; font-style: italic; }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* GALETS */
-        .galets-summary { text-align: center; padding: 10px 0; }
-        .galets-big { font-size: 36px; font-weight: 800; color: #c9a96e; }
-        .galets-label { font-size: 14px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
-        .galets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-        .galet-item { background: rgba(201,169,110,0.12); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(201,169,110,0.2); }
-        .galet-item-val { font-weight: 800; font-size: 16px; color: #c9a96e; }
-        .galet-item-label { font-size: 11px; color: #5a4a3a; margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
-        .galets-earn-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin-top: 12px; background: transparent; border: none; padding: 10px; font-family: 'Nunito'; cursor: pointer; transition: transform 0.15s; }
-        .galets-earn-btn:hover { transform: translateY(-2px); }
-        .galets-earn-btn:active { transform: scale(0.98); }
-        .galets-earn-panda { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.1)); }
-        .galets-earn-text { font-weight: 700; font-size: 14px; color: #3a5a40; line-height: 1.4; }
-        .galets-explain { margin-top: 14px; padding: 12px; background: rgba(160,130,90,0.12); border-radius: 12px; font-size: 13px; color: #5a4a3a; line-height: 1.5; }
-
-        /* PARRAINAGE */
-        .parrain-stats { display: flex; gap: 12px; margin-bottom: 14px; }
-        .parrain-stat { flex: 1; background: rgba(201,169,110,0.12); border-radius: 12px; padding: 14px; text-align: center; border: 1px solid rgba(201,169,110,0.2); }
-        .parrain-v { font-weight: 800; font-size: 20px; color: #34490a; }
-        .parrain-v.gold { color: #c9a96e; }
-        .parrain-l { font-size: 11px; color: #5a4a3a; margin-top: 2px; }
-        .parrain-rules { margin-bottom: 14px; padding: 14px; background: rgba(245,240,235,0.6); border-radius: 12px; }
-        .parrain-rules-title { font-weight: 700; font-size: 13px; color: #2d2f2e; margin-bottom: 10px; cursor: pointer; }
-        .parrain-rule { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
-        .parrain-rule + .parrain-rule { border-top: 1px solid rgba(154,170,156,0.1); padding-top: 8px; }
-        .rule-galets { background: rgba(201,169,110,0.15); color: #c9a96e; border-radius: 8px; padding: 3px 8px; font-weight: 800; font-size: 12px; flex-shrink: 0; border: 1px solid rgba(201,169,110,0.3); }
-        .rule-text { font-size: 12px; color: #2d2f2e; line-height: 1.4; }
-        .filleul-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(154,170,156,0.1); }
-        .filleul-item:last-child { border-bottom: none; }
-        .filleul-name { font-weight: 600; font-size: 13px; flex: 1; }
-        .filleul-date { font-size: 11px; color: #6b7c6e; }
-        .filleul-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
-        .filleul-badge.gratuit { background: rgba(91,122,94,0.1); color: #3a5a40; }
-        .filleul-badge.payant { background: rgba(201,169,110,0.15); color: #c9a96e; }
-        .share-btn { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s; }
-        .share-btn:hover { transform: translateY(-1px); }
-        .share-btn:active { transform: scale(0.98); }
-
-        /* BONUS */
-        .bonus-box { border: 2px solid rgba(201,169,110,0.25); }
-        .bonus-links { display: flex; flex-direction: column; gap: 8px; }
-        .bonus-link-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(154,170,156,0.2); background: rgba(245,240,235,0.5); font-family: 'Nunito'; font-weight: 700; font-size: 14px; color: #2d2f2e; cursor: pointer; text-align: left; transition: background 0.15s; }
-        .bonus-link-btn:hover { background: rgba(245,240,235,0.8); }
-
-        /* MENU */
-        .menu-box { background: rgba(255,255,255,0.93); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(30,39,12,0.05); animation: slideUp 0.4s ease both; }
-        .menu-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: none; background: transparent; cursor: pointer; text-align: left; font-family: 'Nunito'; transition: background 0.15s; }
-        .menu-item:hover { background: rgba(91,122,94,0.04); }
-        .menu-item + .menu-item { border-top: 1px solid rgba(154,170,156,0.1); }
-        .menu-i { font-size: 17px; }
-        .menu-l { flex: 1; font-weight: 600; font-size: 14px; }
-        .menu-l.danger { color: #c0392b; }
-        .menu-v { font-size: 12px; color: #6b7c6e; }
-        .menu-arrow { color: #9aaa9c; font-size: 16px; }
-
-        /* ═══ FOOTER LÉGER ═══ */
-        .app-footer-legal { text-align: center; padding: 16px 0 80px; font-size: 10px; color: #9aaa9c; }
-        /* ═══ NAVIGATION ═══ */
-        .app-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(154,170,156,0.1); display: flex; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); z-index: 100; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0; border: none; background: transparent; cursor: pointer; transition: transform 0.15s; font-family: 'Nunito'; }
-        .nav-btn:active { transform: scale(0.9); }
-        .nav-emoji { font-size: 20px; line-height: 1; }
-        .nav-label { font-size: 10px; color: #2d2f2e; font-weight: 700; }
-        .nav-btn.active .nav-label { color: #34490a; font-weight: 800; }
-        .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: #34490a; }
-
-        /* ═══ ANIMATIONS ═══ */
-        @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: slideUp 0.4s ease both; }
-
-      /* === BREATHING === */
-.breath-cat-card {
-  width: 100%; border: none; border-radius: 14px; padding: 14px 16px;
-  font-family: 'Nunito', sans-serif; cursor: pointer; text-align: left;
-  background: rgba(255,255,255,0.93); border-left: 4px solid #468a4d;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.15s; margin-bottom: 12px;
-}
-.breath-cat-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.breath-back {
-  background: rgba(240,237,232,0.8); border: none; border-radius: 10px;
-  padding: 7px 14px; font-size: 13px; color: #3a5a40; cursor: pointer;
-  margin-bottom: 18px; font-weight: 700; font-family: 'Nunito', sans-serif; display: inline-block;
-}
-.breath-ex-card {
-  background: white; border: 1px solid rgba(220,215,208,0.8); border-radius: 12px;
-  padding: 14px; cursor: pointer; width: 100%; text-align: left; margin-bottom: 10px;
-  transition: all 0.15s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); font-family: 'Nunito', sans-serif;
-}
-.breath-ex-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.breath-ex-name { font-weight: 800; font-size: 15px; color: #1e270c; }
-.breath-ex-subtitle { font-size: 12px; color: #666; margin-bottom: 5px; line-height: 1.4; }
-.breath-ex-duration { font-size: 11px; color: #9aaa9c; font-weight: 600; margin-bottom: 6px; }
-.breath-ex-cta { font-size: 12px; color: #468a4d; font-weight: 800; }
-.breath-timer-btn {
-  flex: 1; border: none; border-radius: 14px; padding: 13px 10px;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; cursor: pointer;
-}
-.breath-timer-btn.primary { background: #468a4d; color: white; }
-.breath-timer-btn.secondary { background: rgba(255,255,255,0.9); color: #3a5a40; border: 1.5px solid rgba(70,138,77,0.25); }
-      `}</style>
-
-      <div className="app-shell">
-        {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
-        <div className="app-header">
-          <div style={{width: 36}} />
-          <div className="header-logo">
-            <div className="header-panda">{P.logo}</div>
-            <div className="header-title">PANDA ZEN</div>
-          </div>
-          <button className="header-avatar" onClick={() => goTab(6)}>👤</button>
-        </div>
-
-        {screens[tab]}
-        <div className="app-footer-legal">© Centre VITA — VITA® · Panda Zen™</div>
-
-        <div className="app-nav">
-          {tabs.filter(t => t.id !== "profile").map((t, i) => (
-            <button key={t.id} className={`nav-btn ${tab===i?"active":""}`} onClick={() => goTab(i)}>
-              <span className="nav-emoji">{t.icon}</span>
-              <span className="nav-label">{t.label}</span>
-              {tab===i && <div className="nav-dot" />}
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
+export default BreathScreen;
