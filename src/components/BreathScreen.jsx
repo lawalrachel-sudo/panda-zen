@@ -10,11 +10,11 @@ import React from 'react';
 //   5. Page blanche fix — return null sécurisé
 // ═══════════════════════════════════════
 
-const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/video/upload/';
+const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/raw/upload/';
 const MUSIC_LIBRARY = {
-  zen:    ['zen_1.mp3','zen_2.mp3','zen_3.mp3','zen_4.mp3','zen_5.mp3'],
-  bols:   ['bols_1.mp3','bols_2.mp3','bols_3.mp3'],
-  nature: ['nature_1.mp3','nature_2.mp3','nature_3.mp3']
+  zen:    ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3','zen_4_sbmwv1.mp3','zen_5_vywvrq.mp3'],
+  bols:   ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3'],
+  nature: ['zen_3_c6xvsz.mp3','zen_4_sbmwv1.mp3','zen_5_vywvrq.mp3']
 };
 const MUSIC_CONFIG = {
   breathe:   'bols',
@@ -503,17 +503,19 @@ const img = (file, alt, style = {}) =>
 // ─────────────────────────────────────────
 const MusicBtn = ({ music }) => (
   <>
+    {/* Bouton son — position fixe bas droite, au-dessus de la nav (bottom:72px) */}
     <button onClick={music.toggle} style={{
-      position: 'absolute', top: 58, right: 16,
-      background: 'rgba(255,255,255,0.85)', border: '1px solid rgba(154,170,156,0.2)',
-      borderRadius: 10, padding: '5px 9px', fontSize: 16, cursor: 'pointer', zIndex: 40
+      position: 'fixed', bottom: 72, right: 16,
+      background: 'rgba(255,255,255,0.92)', border: '1px solid rgba(154,170,156,0.25)',
+      borderRadius: 12, padding: '8px 12px', fontSize: 18, cursor: 'pointer',
+      zIndex: 90, boxShadow: '0 2px 10px rgba(0,0,0,0.12)'
     }}>{music.playing ? '🎵' : '🔇'}</button>
     {music.showToast && (
       <div style={{
-        position: 'absolute', top: 44, left: '50%', transform: 'translateX(-50%)',
+        position: 'fixed', bottom: 122, right: 16,
         background: 'rgba(30,39,12,0.82)', color: 'white', borderRadius: 12,
-        padding: '8px 16px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
-      }}>🐼 Panda a choisi une musique pour cette salle</div>
+        padding: '8px 14px', fontSize: 12, fontWeight: 600, zIndex: 100, whiteSpace: 'nowrap'
+      }}>🐼 musique pour cette salle</div>
     )}
   </>
 );
