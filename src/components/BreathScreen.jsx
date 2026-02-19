@@ -1,4 +1,5 @@
 import React from 'react';
+
 // ═══════════════════════════════════════
 // MODULE BREATHING V13 - PANDA ZEN
 // Base : V8 + nouveautés V13 (18/02/2026)
@@ -920,7 +921,5 @@ const BreathScreen = ({ galets, setGalets }) => {
 }
 .breath-timer-btn.primary { background: #468a4d; color: white; }
 .breath-timer-btn.secondary { background: rgba(255,255,255,0.9); color: #3a5a40; border: 1.5px solid rgba(70,138,77,0.25); }
-*/
-};
 
 export default BreathScreen;
