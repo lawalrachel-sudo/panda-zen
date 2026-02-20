@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import BreathScreen from './components/BreathScreen';
 
 // ═══════════════════════════════════════
 // PANDA ZEN — APP COMPLÈTE v1
 // Fusion skeleton-v3 + profil-v5
-// 16/02/2026
+// 19/02/2026
 // ═══════════════════════════════════════
 
 // PNG pandas transparents dans /images/
@@ -116,20 +117,6 @@ const HomeScreen = ({ galets, streak, onNav }) => {
 };
 
 // ═══════════════════════════════════════
-// ÉCRAN RESPIRER
-// ═══════════════════════════════════════
-const BreathScreen = () => (
-  <div className="screen center-screen">
-    <div className="module-card fade-in">
-      <div className="module-panda big">{P.breathe}</div>
-      <h2 className="title-lg">Respiration</h2>
-      <p className="module-desc">Des exercices adaptés selon ton profil — 18 techniques de cohérence cardiaque.</p>
-      <div className="phase-badge">⏳ Module breathing-v8 à intégrer</div>
-    </div>
-  </div>
-);
-
-// ═══════════════════════════════════════
 // ÉCRAN CARTE VITA
 // ═══════════════════════════════════════
 const CardScreen = () => (
@@ -162,8 +149,8 @@ const RelaxScreen = () => (
 // ═══════════════════════════════════════
 const WaterScreen = ({ galets, setGalets }) => {
   const [glasses, setGlasses] = useState(0);
-  const [goalMl, setGoalMl] = useState(1600); // 1L à 2L par défaut 1.6L
-  const glassSize = 200; // ml par verre
+  const [goalMl, setGoalMl] = useState(1600);
+  const glassSize = 200;
   const goal = Math.round(goalMl / glassSize);
   const [showInfo, setShowInfo] = useState(false);
   const pct = Math.min(100, Math.round((glasses / goal) * 100));
@@ -190,7 +177,7 @@ const WaterScreen = ({ galets, setGalets }) => {
           <p className="tagline-sm">{pct >= 100 ? "Objectif atteint ! Bravo !" : "S'hydrater pour éliminer."}</p>
         </div>
       </div>
-      <button className="water-info-toggle" onClick={() => setShowInfo(!showInfo)}>{showInfo ? "â–¼" : "â–¶"} Pourquoi c'est important ?</button>
+      <button className="water-info-toggle" onClick={() => setShowInfo(!showInfo)}>{showInfo ? "▼" : "▶"} Pourquoi c'est important ?</button>
       {showInfo && (
         <div className="water-info-text fade-in">
           L'eau représente 60% de ton corps. Une bonne hydratation améliore ta concentration, ton humeur et ta digestion. Adapte ton objectif à ta morphologie et tes activités. Le rappel te permet de répartir tes verres sur la journée.
@@ -213,7 +200,6 @@ const WaterScreen = ({ galets, setGalets }) => {
         </div>
       </div>
 
-      {/* OBJECTIF + GALETS */}
       <div className="card water-goal-card fade-in" style={{ animationDelay: "0.05s" }}>
         <span className="card-title-sm">Mon objectif : {goalMl/1000}L ({goal} verres de {glassSize}ml)</span>
         <div className="goal-options">
@@ -233,12 +219,10 @@ const WaterScreen = ({ galets, setGalets }) => {
         </div>
       </div>
 
-      {/* CTA MODULE */}
       <button className="water-module-cta fade-in" style={{ animationDelay: "0.1s" }}>
         💧 Mieux comprendre, mieux s'hydrater
       </button>
 
-      {/* RAPPELS */}
       <div className="card fade-in" style={{ animationDelay: "0.12s" }}>
         <span className="card-title-sm">🔔 Rappels hydratation</span>
         <p className="water-reminder-desc">Reçois un rappel pour boire régulièrement. On fragmente ton objectif sur ta journée.</p>
@@ -281,7 +265,6 @@ const WaterScreen = ({ galets, setGalets }) => {
         <p className="reminder-note">Fonctionne sur iPhone et Android. Les rappels s'ajoutent à ton calendrier avec notification sonore.</p>
       </div>
 
-      {/* GRAPHIQUE SEMAINE */}
       <div className="card fade-in" style={{ animationDelay: "0.15s" }}>
         <span className="card-title-sm">Ma semaine</span>
         <div className="week-bars">
@@ -331,7 +314,6 @@ const ProfileScreen = ({ galets, streak }) => {
 
   return (
     <div className="screen profil-screen">
-      {/* BOX 1 — MON PROFIL */}
       <div className="profil-box" style={{ animationDelay: "0.05s" }}>
         <div className="avatar-zone">
           <div className="avatar-circle" title="Changer ma photo">
@@ -358,7 +340,6 @@ const ProfileScreen = ({ galets, streak }) => {
         </div>
       </div>
 
-      {/* BOX 2 — MIROIR DU JOUR */}
       <div className="profil-box" style={{ animationDelay: "0.1s" }}>
         <div className="box-header"><div className="box-panda">{P.mirror}</div><div><div className="box-title">Mon Miroir du jour</div><div className="box-subtitle">Découvre quel profil tu actives aujourd'hui</div></div></div>
         <div className="miroir-result">
@@ -381,7 +362,6 @@ const ProfileScreen = ({ galets, streak }) => {
         </div>
       </div>
 
-      {/* BOX 3 — RELATIONS */}
       <div className="profil-box" style={{ animationDelay: "0.15s" }}>
         <div className="box-header"><div className="box-panda">{P.couple}</div><div><div className="box-title">Mon profil en Relation</div><div className="box-subtitle">{DEMO_RELATIONS.length} relations explorées</div></div></div>
         {DEMO_RELATIONS.map(r => {
@@ -423,7 +403,6 @@ const ProfileScreen = ({ galets, streak }) => {
         })}
       </div>
 
-      {/* BOX 4 — CARTES */}
       <div className="profil-box" style={{ animationDelay: "0.2s" }}>
         <div className="box-header"><div className="box-panda">{P.cards}</div><div><div className="box-title">Les cartes déjà sorties pour moi</div><div className="box-subtitle">{DEMO_CARTES.length} cartes tirées</div></div></div>
         {DEMO_CARTES.map(c => {
@@ -448,7 +427,6 @@ const ProfileScreen = ({ galets, streak }) => {
         <button className="carte-buy-btn">🎴 Bientôt disponible : le jeu complet de 72 cartes en coffret</button>
       </div>
 
-      {/* BOX 5 — CHEMIN MUDRÂS */}
       <div className="profil-box" style={{ animationDelay: "0.22s" }}>
         <div className="box-header-vertical">
           <div className="box-panda-lg">{P.mudra}</div>
@@ -487,7 +465,6 @@ const ProfileScreen = ({ galets, streak }) => {
         <button className="path-cta-violet">Voir mes mudrâs reçus</button>
       </div>
 
-      {/* BOX 6 — GALETS */}
       <div className="profil-box" style={{ animationDelay: "0.25s" }}>
         <div className="box-header"><div className="box-panda">{P.galets}</div><div><div className="box-title">Mes galets gagnés</div><div className="box-subtitle">Construis ton équilibre, galet par galet</div></div></div>
         <div className="galets-summary"><div className="galets-big">{galets}</div><div className="galets-label">galets au total</div></div>
@@ -506,7 +483,6 @@ const ProfileScreen = ({ galets, streak }) => {
         <div className="galets-explain">💡 Tes galets symbolisent ton engagement envers toi-même. Chaque action compte. Invite tes proches pour en gagner davantage !</div>
       </div>
 
-      {/* BOX 7 — PARRAINAGE */}
       <div className="profil-box" style={{ animationDelay: "0.3s" }}>
         <div className="box-header"><div className="box-panda">{P.envelope}</div><div><div className="box-title">Parrainage</div><div className="box-subtitle">Invite tes proches, gagne des galets !</div></div></div>
         <div className="parrain-stats">
@@ -531,7 +507,6 @@ const ProfileScreen = ({ galets, streak }) => {
         <button className="share-btn">✉️ Inviter un ami</button>
       </div>
 
-      {/* BOX BONUS */}
       <div className="profil-box bonus-box" style={{ animationDelay: "0.35s" }}>
         <div className="box-header"><div className="box-panda" style={{fontSize:32}}>⭐</div><div><div className="box-title">Bonus</div><div className="box-subtitle">Ressources, contact & partenariats</div></div></div>
         <div className="bonus-links">
@@ -542,7 +517,6 @@ const ProfileScreen = ({ galets, streak }) => {
         </div>
       </div>
 
-      {/* RÉGLAGES */}
       <h3 className="section-title-profil">⚙️ Réglages</h3>
       <div className="menu-box" style={{ animationDelay: "0.35s" }}>
         {[
@@ -570,14 +544,13 @@ const ProfileScreen = ({ galets, streak }) => {
 // SPLASH SCREEN (style Duolingo)
 // ═══════════════════════════════════════
 const SplashScreen = ({ onDone }) => {
-  const [phase, setPhase] = useState(0); // 0=panda, 1=titre, 2=fade-out
+  const [phase, setPhase] = useState(0);
   const doneRef = useRef(false);
   const finish = () => { if (!doneRef.current) { doneRef.current = true; onDone(); } };
   useEffect(() => {
     const t1 = setTimeout(() => setPhase(1), 2000);
     const t2 = setTimeout(() => setPhase(2), 4000);
     const t3 = setTimeout(finish, 4600);
-    // Fallback de sécurité — si rien ne se passe après 6s, on ferme quand même
     const safety = setTimeout(finish, 6000);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(safety); };
   }, []);
@@ -619,7 +592,7 @@ export default function PandaZenApp() {
 
   const screens = [
     <HomeScreen galets={galets} streak={streak} onNav={goTab} />,
-    <BreathScreen />,
+    <BreathScreen galets={galets} setGalets={setGalets} />,
     <CardScreen />,
     <RelaxScreen />,
     <WaterScreen galets={galets} setGalets={setGalets} />,
@@ -633,13 +606,11 @@ export default function PandaZenApp() {
         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Nunito:wght@400;600;700;800&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ═══ APP SHELL ═══ */
         .panda-icon {
           display: inline-block;
           object-fit: contain;
           vertical-align: middle;
         }
-        /* Tailles par contexte — agrandies */
         .header-panda .panda-icon { width: 38px; height: 38px; }
         .home-hero-panda .panda-icon { width: 80px; height: 80px; }
         .home-stat-icon .panda-icon { width: 28px; height: 28px; }
@@ -653,7 +624,7 @@ export default function PandaZenApp() {
         .miroir-animal .panda-icon { width: 56px; height: 56px; }
         .miroir-insight-panda .panda-icon { width: 34px; height: 34px; }
         .avatar-circle .panda-icon { width: 52px; height: 52px; }
-        .nav-emoji .panda-icon { width: 26px; height: 26px; }
+        .nav-emoji .panda-icon { width: 34px; height: 34px; }
         .miroir-cta-panda .panda-icon { width: 64px; height: 64px; }
         .galets-big .panda-icon { width: 36px; height: 36px; }
         .pstat-v .panda-icon { width: 18px; height: 18px; }
@@ -666,7 +637,47 @@ export default function PandaZenApp() {
         .path-galet-hint .panda-icon { width: 16px; height: 16px; }
         .path-stat-v .panda-icon { width: 16px; height: 16px; }
 
-        /* ═══ SPLASH SCREEN 2 PHASES (Duolingo style) ═══ */
+        /* ═══ BREATHING CSS ═══ */
+        .breath-back {
+          display: inline-flex; align-items: center; gap: 6px;
+          background: none; border: none; font-family: 'Nunito', sans-serif;
+          font-weight: 700; font-size: 14px; color: #5b7a5e;
+          cursor: pointer; padding: 4px 0; margin-bottom: 16px;
+        }
+        .breath-back:hover { color: #3a5a40; }
+        .breath-cat-card {
+          width: 100%; background: rgba(255,255,255,0.93);
+          border: none; border-left: 4px solid #468a4d;
+          border-radius: 14px; padding: 16px; margin-bottom: 10px;
+          font-family: 'Nunito', sans-serif; cursor: pointer; text-align: left;
+          box-shadow: 0 2px 10px rgba(30,39,12,0.05);
+          transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .breath-cat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(30,39,12,0.1); }
+        .breath-cat-card:active { transform: scale(0.98); }
+        .breath-ex-card {
+          width: 100%; background: rgba(255,255,255,0.93);
+          border: none; border-radius: 14px; padding: 16px; margin-bottom: 10px;
+          font-family: 'Nunito', sans-serif; cursor: pointer; text-align: left;
+          box-shadow: 0 2px 10px rgba(30,39,12,0.05);
+          transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .breath-ex-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(30,39,12,0.1); }
+        .breath-ex-card:active { transform: scale(0.98); }
+        .breath-ex-name { font-weight: 800; font-size: 15px; color: #1e270c; }
+        .breath-ex-subtitle { font-size: 13px; color: #5b7a5e; margin-top: 3px; font-weight: 600; }
+        .breath-ex-duration { font-size: 12px; color: #9aaa9c; margin-top: 4px; }
+        .breath-ex-cta { font-size: 12px; color: #468a4d; font-weight: 700; margin-top: 8px; }
+        .breath-timer-btn {
+          padding: 11px 20px; border-radius: 12px; border: none;
+          font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px;
+          cursor: pointer; transition: transform 0.15s;
+        }
+        .breath-timer-btn:active { transform: scale(0.96); }
+        .breath-timer-btn.primary { background: #468a4d; color: white; }
+        .breath-timer-btn.secondary { background: rgba(70,138,77,0.1); color: #468a4d; }
+
+        /* ═══ SPLASH ═══ */
         .splash-screen {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
           background: #3a5a40;
@@ -691,11 +702,10 @@ export default function PandaZenApp() {
         .splash-credit { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 24px; }
         @keyframes splashBounce { 0% { opacity: 0; transform: scale(0.4); } 60% { transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* ═══ MIROIR CTA HOME (fond blanc, bord doré) ═══ */
+        /* ═══ MIROIR CTA HOME ═══ */
         .miroir-cta-home {
           width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px;
-          background: white;
-          border: 2.5px solid #c9a96e;
+          background: white; border: 2.5px solid #c9a96e;
           border-radius: 20px; padding: 20px 16px 16px;
           margin-bottom: 20px; cursor: pointer;
           box-shadow: 0 4px 20px rgba(201,169,110,0.15);
@@ -710,14 +720,14 @@ export default function PandaZenApp() {
         .miroir-cta-desc { font-size: 13px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
         .miroir-cta-badge { background: #f5eedd; border: 1.5px solid #d4b87a; border-radius: 20px; padding: 4px 12px; font-weight: 700; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; margin-top: 4px; }
         .miroir-cta-btn { margin-top: 8px; background: #3a5a40; color: white; border: none; border-radius: 12px; padding: 10px 32px; font-weight: 800; font-size: 14px; letter-spacing: 0.3px; }
+
+        /* ═══ APP SHELL ═══ */
         .app-shell {
           max-width: 430px; margin: 0 auto; min-height: 100vh;
           background: linear-gradient(180deg, #f5f0eb 0%, #f0ede8 40%, #e8f0e4 100%);
           font-family: 'Nunito', sans-serif; color: #2d2f2e;
           position: relative; overflow-x: hidden;
         }
-
-        /* ═══ HEADER ═══ */
         .app-header {
           position: sticky; top: 0; z-index: 100;
           background: rgba(245,240,235,0.92);
@@ -732,17 +742,13 @@ export default function PandaZenApp() {
         .header-avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(91,122,94,0.4); background: linear-gradient(135deg,#e8f0e4,#f5f0eb); font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 8px rgba(30,39,12,0.1); }
         .header-avatar:hover { transform: scale(1.1); box-shadow: 0 3px 12px rgba(30,39,12,0.15); }
         .header-avatar:active { transform: scale(0.95); }
-
-        /* ═══ SCREENS ═══ */
         .screen { padding: 20px 16px 20px; }
         .center-screen { text-align: center; }
-
-        /* ═══ TYPOGRAPHY ═══ */
         .title-lg { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 24px; color: #1e270c; }
         .section-title { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 18px; color: #1e270c; margin-bottom: 14px; }
         .tagline-sm { font-size: 15px; color: #3a5a40; margin-top: 4px; line-height: 1.4; font-weight: 600; }
 
-        /* ═══ HOME v2 ═══ */
+        /* ═══ HOME ═══ */
         .home-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; animation: slideUp 0.5s ease both; }
         .home-hero-panda { font-size: 60px; line-height: 1; }
         .home-greeting { font-family: 'Josefin Sans', sans-serif; font-weight: 700; font-size: 26px; color: #1e270c; }
@@ -764,13 +770,9 @@ export default function PandaZenApp() {
         .home-action-desc { font-size: 13px; color: #2d3a2e; margin-top: 3px; font-weight: 600; line-height: 1.4; }
         .home-galet-badge { background: #f5f0eb; border: 1.5px solid #c9a96e; border-radius: 20px; padding: 5px 12px; font-weight: 800; font-size: 12px; color: #8a7040; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
 
-        /* ═══ CARDS GENERIC ═══ */
+        /* ═══ CARDS ═══ */
         .card { background: rgba(255,255,255,0.93); border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(30,39,12,0.05); margin-bottom: 12px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
         .card-title-sm { font-weight: 800; font-size: 15px; color: #1e270c; margin-bottom: 10px; }
-        .link-btn { background: none; border: none; color: #5b7a5e; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Nunito', sans-serif; }
-
-        /* ═══ MODULE PLACEHOLDER ═══ */
         .module-card { background: rgba(255,255,255,0.93); border-radius: 24px; padding: 40px 24px; box-shadow: 0 4px 20px rgba(30,39,12,0.07); }
         .module-panda { font-size: 80px; line-height: 1; margin-bottom: 16px; }
         .module-panda.big { font-size: 100px; }
@@ -799,7 +801,6 @@ export default function PandaZenApp() {
         .goal-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
         .goal-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid #9aaa9c; background: transparent; font-family: 'Nunito'; font-size: 14px; color: #2d2f2e; cursor: pointer; transition: all 0.15s; }
         .goal-btn.active { border: 2px solid #34490a; background: rgba(52,73,10,0.08); font-weight: 700; color: #34490a; }
-        .goal-btn:hover { background: rgba(52,73,10,0.05); }
         .water-goal-card { padding-bottom: 20px; }
         .water-galet-rewards { margin-top: 16px; border-top: 1px solid rgba(154,170,156,0.15); padding-top: 14px; }
         .water-reward-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; }
@@ -808,8 +809,6 @@ export default function PandaZenApp() {
         .water-reward-val { display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 14px; color: #c9a96e; }
         .water-check { color: #3a5a40; font-weight: 800; font-size: 16px; }
         .water-module-cta { display: block; width: 100%; background: white; border: 2px solid #4a8fa8; border-radius: 16px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; color: #3a7a94; cursor: pointer; text-align: center; margin-bottom: 12px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 2px 10px rgba(74,143,168,0.1); animation: waterPulse 2.5s ease-in-out infinite; }
-        .water-module-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(74,143,168,0.2); animation: none; }
-        .water-module-cta:active { transform: scale(0.98); animation: none; }
         @keyframes waterPulse { 0%,100% { box-shadow: 0 2px 10px rgba(74,143,168,0.1); } 50% { box-shadow: 0 2px 20px rgba(74,143,168,0.35); border-color: #3a7a94; } }
         .water-reminder-desc { font-size: 13px; color: #2d3a2e; font-weight: 600; line-height: 1.5; margin-bottom: 12px; }
         .water-reminder-config { background: rgba(74,143,168,0.06); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
@@ -818,8 +817,6 @@ export default function PandaZenApp() {
         .reminder-select { padding: 8px 12px; border: 1.5px solid #4a8fa8; border-radius: 10px; font-family: 'Nunito'; font-size: 14px; font-weight: 700; color: #3a7a94; background: white; cursor: pointer; }
         .reminder-calc { text-align: center; margin-top: 8px; font-size: 13px; font-weight: 700; color: #4a8fa8; }
         .water-reminder-btn { display: block; width: 100%; background: linear-gradient(135deg, #4a8fa8, #3a7a94); color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 3px 12px rgba(74,143,168,0.3); transition: transform 0.15s, box-shadow 0.15s; }
-        .water-reminder-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(74,143,168,0.4); }
-        .water-reminder-btn:active { transform: scale(0.98); }
         .reminder-note { font-size: 11px; color: #6b7c6e; text-align: center; margin-top: 8px; font-style: italic; }
         .week-bars { display: flex; justify-content: space-between; margin-top: 14px; }
         .week-col { text-align: center; flex: 1; }
@@ -829,7 +826,7 @@ export default function PandaZenApp() {
         .bar-label { font-size: 12px; color: #3a5a40; font-weight: 600; }
         .bar-label.today { color: #3a7a94; font-weight: 800; }
 
-        /* ═══ PROFIL v5 ═══ */
+        /* ═══ PROFIL ═══ */
         .profil-screen { padding-top: 10px; }
         .profil-box { background: rgba(255,255,255,0.93); border-radius: 20px; margin-bottom: 14px; padding: 20px; box-shadow: 0 2px 14px rgba(30,39,12,0.06); animation: slideUp 0.4s ease both; }
         .box-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
@@ -852,8 +849,6 @@ export default function PandaZenApp() {
         .pstat-v.orange { color: #d4845a; }
         .pstat-l { font-size: 12px; color: #3a5a40; font-weight: 600; }
         .pstat-div { width: 1px; height: 28px; background: rgba(154,170,156,0.2); }
-
-        /* MIROIR */
         .miroir-result { background: linear-gradient(135deg,#f5f0eb,#e8f0e4); border-radius: 16px; padding: 20px; text-align: center; }
         .miroir-date { font-size: 12px; color: #6b7c6e; margin-bottom: 8px; font-weight: 600; }
         .miroir-animal { font-size: 48px; margin-bottom: 6px; }
@@ -868,18 +863,12 @@ export default function PandaZenApp() {
         .miroir-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
         .tag-plus { flex: 1; min-width: calc(50% - 4px); background: rgba(91,122,94,0.12); color: #3a5a40; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
         .tag-minus { flex: 1; min-width: calc(50% - 4px); background: rgba(192,120,90,0.12); color: #a0604a; border-radius: 14px; padding: 8px 14px; font-size: 13px; font-weight: 700; text-align: center; }
-        .miroir-btns { display: flex; gap: 8px; margin-top: 16px; }
-        .miroir-cta { flex: 1; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
-        .miroir-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(52,73,10,0.2); }
-        .miroir-cta:active { transform: scale(0.98); }
-        .miroir-share { width: 48px; background: linear-gradient(135deg,#c9a96e,#b89860); color: white; border: none; border-radius: 14px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.15s; box-shadow: 0 2px 8px rgba(201,169,110,0.3); }
-        .miroir-share:hover { transform: translateY(-1px); }
-
-        /* RELATIONS */
+        .miroir-btns-5050 { display: flex; gap: 8px; margin-top: 16px; }
+        .miroir-cta-half { flex: 1; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .miroir-share-half { width: 48px; background: linear-gradient(135deg,#c9a96e,#b89860); color: white; border: none; border-radius: 14px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(201,169,110,0.3); }
         .relation-item { border-bottom: 1px solid rgba(154,170,156,0.1); padding: 12px 0; }
         .relation-item:last-child { border-bottom: none; }
         .relation-top { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; background: none; border: none; font-family: 'Nunito'; text-align: left; padding: 0; }
-        .relation-top:hover { opacity: 0.85; }
         .rel-animal { font-size: 28px; }
         .rel-info { flex: 1; }
         .rel-label { font-weight: 800; font-size: 16px; color: #1e270c; }
@@ -890,31 +879,22 @@ export default function PandaZenApp() {
         .relation-detail { margin-top: 10px; padding: 16px; background: rgba(245,240,235,0.6); border-radius: 12px; font-size: 13px; color: #2d2f2e; line-height: 1.7; }
         .relation-detail .tags-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
         .rel-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .rel-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Nunito'; font-weight: 600; font-size: 12px; cursor: pointer; transition: transform 0.15s; }
-        .rel-btn:active { transform: scale(0.96); }
+        .rel-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; font-family: 'Nunito'; font-weight: 600; font-size: 12px; cursor: pointer; }
         .rel-btn.continue { background: #34490a; color: white; }
         .rel-btn.share { background: rgba(91,122,94,0.12); color: #3a5a40; }
         .testimonial-zone { margin-top: 10px; padding: 12px; background: rgba(201,169,110,0.08); border-radius: 12px; }
         .testimonial-zone h4 { font-size: 13px; font-weight: 700; color: #c9a96e; margin-bottom: 8px; }
         .testimonial-input { width: 100%; border: 1px solid rgba(154,170,156,0.3); border-radius: 10px; padding: 10px; font-family: 'Nunito'; font-size: 13px; resize: vertical; min-height: 60px; background: white; outline: none; }
-        .testimonial-input:focus { border-color: #5b7a5e; }
         .testimonial-submit { margin-top: 8px; background: #c9a96e; color: white; border: none; border-radius: 10px; padding: 8px 16px; font-family: 'Nunito'; font-weight: 700; font-size: 12px; cursor: pointer; }
-
-        /* CARTES */
         .carte-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(154,170,156,0.1); cursor: pointer; }
-        .carte-item:last-child { border-bottom: none; }
-        .carte-item:hover { opacity: 0.85; }
-        .carte-dos { width: 40px; height: 54px; border-radius: 8px; background: linear-gradient(135deg,#a8d8ea,#82c4d8); border: 2px solid #5ba0b5; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Josefin Sans'; font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(91,160,181,0.25); flex-shrink: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .carte-dos { width: 40px; height: 54px; border-radius: 8px; background: linear-gradient(135deg,#a8d8ea,#82c4d8); border: 2px solid #5ba0b5; display: flex; align-items: center; justify-content: center; color: white; font-family: 'Josefin Sans'; font-weight: 700; font-size: 16px; box-shadow: 0 2px 6px rgba(91,160,181,0.25); flex-shrink: 0; }
         .carte-phrase { flex: 1; font-size: 13px; color: #2d2f2e; line-height: 1.4; font-style: italic; }
         .carte-expand { padding: 12px; margin: 4px 0 8px; background: rgba(245,240,235,0.6); border-radius: 12px; }
         .carte-level { margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid rgba(154,170,156,0.08); }
         .carte-level:last-child { border-bottom: none; }
         .carte-level-name { font-weight: 700; font-size: 12px; color: #5b7a5e; margin-bottom: 4px; }
         .carte-level-text { font-size: 13px; line-height: 1.5; }
-        .carte-buy-btn { display: block; width: 100%; margin-top: 14px; background: rgba(168,216,234,0.15); border: 2px solid #82c4d8; color: #4a8fa8; border-radius: 14px; padding: 12px; font-family: 'Nunito'; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; transition: background 0.15s; }
-        .carte-buy-btn:hover { background: rgba(168,216,234,0.25); }
-
-        /* CHEMIN MUDRÂS */
+        .carte-buy-btn { display: block; width: 100%; margin-top: 14px; background: rgba(168,216,234,0.15); border: 2px solid #82c4d8; color: #4a8fa8; border-radius: 14px; padding: 12px; font-family: 'Nunito'; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; }
         .path-container { position: relative; padding: 14px 10px; background: rgba(107,163,190,0.12); border-radius: 14px; }
         .stepping-stones { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 0; }
         .stone { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; transition: all 0.3s ease; }
@@ -926,8 +906,7 @@ export default function PandaZenApp() {
         .stone.mudra-stone.current { border-color: #c9a96e; }
         .stone.mudra-stone.upcoming { border-color: rgba(154,170,156,0.2); }
         .stone.mudra-stone.special { border-color: #5a5aa0; }
-        .stone.mudra-stone.special.walked { background: linear-gradient(135deg,#5a5aa0,#7a6ab0); box-shadow: 0 2px 8px rgba(90,90,160,0.35); }
-        .stone.mudra-stone.final { border-color: #3a2a6e; border-width: 2px; }
+        .stone.mudra-stone.special.walked { background: linear-gradient(135deg,#5a5aa0,#7a6ab0); }
         .stone.mudra-stone.final.upcoming { background: rgba(90,90,160,0.35); }
         .path-legend { display: flex; gap: 14px; justify-content: center; margin-top: 10px; font-size: 10px; color: #6b7c6e; }
         .legend-item { display: flex; align-items: center; gap: 4px; }
@@ -942,14 +921,8 @@ export default function PandaZenApp() {
         .path-stat { text-align: center; }
         .path-stat-v { font-weight: 800; font-size: 16px; color: #3a5a40; display: flex; align-items: center; gap: 4px; }
         .path-stat-l { font-size: 11px; color: #3a5a40; font-weight: 600; }
-        .path-cta { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s; }
-        .path-cta:hover { transform: translateY(-1px); }
-        .path-cta:active { transform: scale(0.98); }
+        .path-cta-violet { display: block; width: 100%; margin-top: 14px; background: #5a5aa0; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; }
         .path-galet-hint { margin-top: 10px; padding: 12px; background: rgba(201,169,110,0.1); border-radius: 10px; font-size: 13px; color: #3a5a40; text-align: center; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .path-credit { margin-top: 10px; font-size: 11px; color: #9aaa9c; text-align: center; font-style: italic; }
-        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-        /* GALETS */
         .galets-summary { text-align: center; padding: 10px 0; }
         .galets-big { font-size: 36px; font-weight: 800; color: #c9a96e; }
         .galets-label { font-size: 14px; color: #3a5a40; margin-top: 2px; font-weight: 600; }
@@ -958,13 +931,9 @@ export default function PandaZenApp() {
         .galet-item-val { font-weight: 800; font-size: 16px; color: #c9a96e; }
         .galet-item-label { font-size: 11px; color: #5a4a3a; margin-top: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
         .galets-earn-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; margin-top: 12px; background: transparent; border: none; padding: 10px; font-family: 'Nunito'; cursor: pointer; transition: transform 0.15s; }
-        .galets-earn-btn:hover { transform: translateY(-2px); }
-        .galets-earn-btn:active { transform: scale(0.98); }
         .galets-earn-panda { filter: drop-shadow(0 3px 8px rgba(0,0,0,0.1)); }
         .galets-earn-text { font-weight: 700; font-size: 14px; color: #3a5a40; line-height: 1.4; }
         .galets-explain { margin-top: 14px; padding: 12px; background: rgba(160,130,90,0.12); border-radius: 12px; font-size: 13px; color: #5a4a3a; line-height: 1.5; }
-
-        /* PARRAINAGE */
         .parrain-stats { display: flex; gap: 12px; margin-bottom: 14px; }
         .parrain-stat { flex: 1; background: rgba(201,169,110,0.12); border-radius: 12px; padding: 14px; text-align: center; border: 1px solid rgba(201,169,110,0.2); }
         .parrain-v { font-weight: 800; font-size: 20px; color: #34490a; }
@@ -973,27 +942,18 @@ export default function PandaZenApp() {
         .parrain-rules { margin-bottom: 14px; padding: 14px; background: rgba(245,240,235,0.6); border-radius: 12px; }
         .parrain-rules-title { font-weight: 700; font-size: 13px; color: #2d2f2e; margin-bottom: 10px; cursor: pointer; }
         .parrain-rule { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
-        .parrain-rule + .parrain-rule { border-top: 1px solid rgba(154,170,156,0.1); padding-top: 8px; }
         .rule-galets { background: rgba(201,169,110,0.15); color: #c9a96e; border-radius: 8px; padding: 3px 8px; font-weight: 800; font-size: 12px; flex-shrink: 0; border: 1px solid rgba(201,169,110,0.3); }
-        .rule-text { font-size: 12px; color: #2d2f2e; line-height: 1.4; }
         .filleul-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(154,170,156,0.1); }
-        .filleul-item:last-child { border-bottom: none; }
         .filleul-name { font-weight: 600; font-size: 13px; flex: 1; }
         .filleul-date { font-size: 11px; color: #6b7c6e; }
         .filleul-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
         .filleul-badge.gratuit { background: rgba(91,122,94,0.1); color: #3a5a40; }
         .filleul-badge.payant { background: rgba(201,169,110,0.15); color: #c9a96e; }
-        .share-btn { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s; }
-        .share-btn:hover { transform: translateY(-1px); }
-        .share-btn:active { transform: scale(0.98); }
-
-        /* BONUS */
+        .share-btn { display: block; width: 100%; margin-top: 14px; background: #34490a; color: white; border: none; border-radius: 14px; padding: 14px; font-family: 'Nunito'; font-weight: 700; font-size: 14px; cursor: pointer; }
         .bonus-box { border: 2px solid rgba(201,169,110,0.25); }
         .bonus-links { display: flex; flex-direction: column; gap: 8px; }
-        .bonus-link-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(154,170,156,0.2); background: rgba(245,240,235,0.5); font-family: 'Nunito'; font-weight: 700; font-size: 14px; color: #2d2f2e; cursor: pointer; text-align: left; transition: background 0.15s; }
-        .bonus-link-btn:hover { background: rgba(245,240,235,0.8); }
-
-        /* MENU */
+        .bonus-link-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(154,170,156,0.2); background: rgba(245,240,235,0.5); font-family: 'Nunito'; font-weight: 700; font-size: 14px; color: #2d2f2e; cursor: pointer; text-align: left; }
+        .section-title-profil { font-family: 'Josefin Sans'; font-weight: 700; font-size: 16px; color: #1e270c; margin: 20px 0 10px; }
         .menu-box { background: rgba(255,255,255,0.93); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(30,39,12,0.05); animation: slideUp 0.4s ease both; }
         .menu-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: none; background: transparent; cursor: pointer; text-align: left; font-family: 'Nunito'; transition: background 0.15s; }
         .menu-item:hover { background: rgba(91,122,94,0.04); }
@@ -1003,12 +963,11 @@ export default function PandaZenApp() {
         .menu-l.danger { color: #c0392b; }
         .menu-v { font-size: 12px; color: #6b7c6e; }
         .menu-arrow { color: #9aaa9c; font-size: 16px; }
-
-        /* ═══ FOOTER LÉGER ═══ */
         .app-footer-legal { text-align: center; padding: 16px 0 80px; font-size: 10px; color: #9aaa9c; }
-        /* ═══ NAVIGATION ═══ */
+
+        /* ═══ NAV ═══ */
         .app-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(154,170,156,0.1); display: flex; padding: 6px 0 max(6px, env(safe-area-inset-bottom)); z-index: 100; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 0; border: none; background: transparent; cursor: pointer; transition: transform 0.15s; font-family: 'Nunito'; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 2px 0; border: none; background: transparent; cursor: pointer; transition: transform 0.15s; font-family: 'Nunito'; }
         .nav-btn:active { transform: scale(0.9); }
         .nav-emoji { font-size: 20px; line-height: 1; }
         .nav-label { font-size: 10px; color: #2d2f2e; font-weight: 700; }
@@ -1017,6 +976,7 @@ export default function PandaZenApp() {
 
         /* ═══ ANIMATIONS ═══ */
         @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .fade-in { animation: slideUp 0.4s ease both; }
       `}</style>
 
