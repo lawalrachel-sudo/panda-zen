@@ -10,7 +10,7 @@ import React from 'react';
 //   5. Page blanche fix — return null sécurisé
 // ═══════════════════════════════════════
 
-const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/raw/upload/';
+const BASE_SOUNDS = 'https://res.cloudinary.com/dbkpvp9ts/video/upload/';
 const MUSIC_LIBRARY = {
   zen:    ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3','zen_4_sbmwv1.mp3','zen_5_vywvrq.mp3'],
   bols:   ['zen_1_jvu71q.mp3','zen_2_lavq4s.mp3','zen_3_c6xvsz.mp3'],
@@ -583,8 +583,6 @@ const BreathScreen = ({ galets, setGalets }) => {
   React.useEffect(() => { return () => clearTimer(); }, []);
 
   // Scroll haut à chaque changement de vue interne
-  const goView = (v) => { setView(v); window.scrollTo(0, 0); };
-
   const profil = selectedKey ? BREATHING_DATA[selectedKey] : null;
   const KEYS = Object.keys(BREATHING_DATA);
 
@@ -592,21 +590,19 @@ const BreathScreen = ({ galets, setGalets }) => {
   if (view === "welcome") return (
     <div className="screen" style={{ position: 'relative' }}>
       <MusicBtn music={music} />
-      {/* paddingTop:48 = espace sous le bouton musique absolute (hauteur ~36px + marge) */}
-      <div style={{ paddingTop: 48 }}>
-        <div style={{ textAlign: 'center', marginBottom: 14 }}>
+      <div style={{ textAlign: 'center', marginBottom: 14 }}>
           {img('souffle.png', 'Panda respire', { width: 80, height: 80, display: 'block', margin: '0 auto' })}
         </div>
         <div style={{ textAlign: 'center', marginBottom: 26 }}>
           <h2 className="title-lg">Respiration</h2>
           <p className="tagline-sm">18 exercices · 6 profils</p>
         </div>
-        <button className="breath-cat-card" style={{ display: 'block', width: '100%', background: '#468a4d', color: 'white', borderLeft: 'none' }}
-          onClick={() => { setFromGuide(true); setSelectedKey('A'); goView('profil'); }}>
+        <button className="breath-cat-card" style={{ background: '#468a4d', color: 'white', borderLeft: 'none' }}
+          onClick={() => { setFromGuide(true); setSelectedKey('A'); setView('profil'); }}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>🐼 Panda me guide</div>
           <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>Séance préparée selon ton profil</div>
         </button>
-        <button className="breath-cat-card" style={{ display: 'block', width: '100%' }} onClick={() => setView('explore')}>
+        <button className="breath-cat-card" onClick={() => setView('explore')}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>🔍 J'explore</div>
           <div style={{ fontSize: 12, color: '#5a4a3a', marginTop: 4 }}>6 espaces · 18 exercices · tu choisis</div>
         </button>
@@ -614,13 +610,12 @@ const BreathScreen = ({ galets, setGalets }) => {
           Chaque exercice terminé&nbsp;=&nbsp;<span style={{ color: '#c9a96e' }}>+2</span>&nbsp;
           <img src={`${RAW}GALET_SEUL.png`} alt="galet" style={{ width: 20, height: 20, objectFit: 'contain', verticalAlign: 'middle' }} />
         </div>
-      </div>
     </div>
   );
 
   // ── EXPLORE ───────────────────────────────────
   if (view === "explore") return (
-    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+    <div className="screen" style={{ position: 'relative' }}>
       <MusicBtn music={music} />
       <button className="breath-back" onClick={() => setView('welcome')}>← Retour</button>
       <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -632,7 +627,7 @@ const BreathScreen = ({ galets, setGalets }) => {
         return (
           <button key={k} className="breath-cat-card fade-in"
             style={{ borderLeftColor: p.color, display: 'flex', alignItems: 'center', gap: 14 }}
-            onClick={() => { setSelectedKey(k); setFromGuide(false); goView('profil'); }}>
+            onClick={() => { setSelectedKey(k); setFromGuide(false); setView('profil'); }}>
             {img(p.badge, p.animal, { width: 44, height: 44, flexShrink: 0 })}
             <div style={{ flex: 1, textAlign: 'left' }}>
               <div style={{ fontWeight: 800, fontSize: 15 }}>{p.animal}</div>
@@ -647,7 +642,7 @@ const BreathScreen = ({ galets, setGalets }) => {
 
   // ── PROFIL ────────────────────────────────────
   if (view === "profil" && profil) return (
-    <div className="screen" style={{ position: 'relative', paddingTop: 48 }}>
+    <div className="screen" style={{ position: 'relative' }}>
       <MusicBtn music={music} />
       <button className="breath-back" onClick={() => setView(fromGuide ? 'welcome' : 'explore')}>← Retour</button>
       <div style={{ textAlign: 'center', marginBottom: 16, paddingBottom: 14, borderBottom: '1px solid rgba(154,170,156,0.15)' }}>
@@ -670,7 +665,7 @@ const BreathScreen = ({ galets, setGalets }) => {
       {profil.exercises.map((ex, i) => (
         <button key={ex.id} className="breath-ex-card fade-in"
           style={{ animationDelay: `${i * 0.05}s` }}
-          onClick={() => { setSelectedEx(ex); resetTimerState(60); goView('exercise'); }}>
+          onClick={() => { setSelectedEx(ex); resetTimerState(60); setView('exercise'); }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
             <div className="breath-ex-name" style={{ flex: 1 }}>{ex.name}</div>
             {completedEx[ex.id] && (
@@ -694,7 +689,7 @@ const BreathScreen = ({ galets, setGalets }) => {
       {done ? (
         // ── ÉCRAN TERMINÉ ──
         <>
-          <button className="breath-back" onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>← Exercices</button>
+          <button className="breath-back" onClick={() => { clearTimer(); setDone(false); setView('profil'); }}>← Exercices</button>
           <div style={{ textAlign: 'center', padding: '24px 16px 10px' }} className="fade-in">
             {img('pouce_v2.png', 'Bravo', { width: 90, height: 90, display: 'block', margin: '0 auto 14px' })}
             <h3 style={{ fontFamily: "'Josefin Sans',sans-serif", fontSize: 22, color: '#3a5a40', marginBottom: 8, fontWeight: 700 }}>Belle séance !</h3>
@@ -706,7 +701,7 @@ const BreathScreen = ({ galets, setGalets }) => {
             </div>
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
               <button className="breath-timer-btn primary" style={{ flex: 1 }}
-                onClick={() => { clearTimer(); setDone(false); goView('profil'); }}>Autre exercice</button>
+                onClick={() => { clearTimer(); setDone(false); setView('profil'); }}>Autre exercice</button>
               <button className="breath-timer-btn secondary" style={{ flex: 1 }}
                 onClick={() => resetTimerState(duration)}>Recommencer</button>
             </div>
@@ -728,7 +723,7 @@ const BreathScreen = ({ galets, setGalets }) => {
       ) : (
         // ── ÉCRAN EXERCICE ──
         <>
-          <button className="breath-back" onClick={() => { clearTimer(); setRunning(false); setPaused(false); goView('profil'); }}>← Exercices</button>
+          <button className="breath-back" onClick={() => { clearTimer(); setRunning(false); setPaused(false); setView('profil'); }}>← Exercices</button>
 
           {/* Titre + badge profil — CORRECTION : badge visible à droite */}
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
